@@ -1,0 +1,321 @@
+VitsModel(
+  (text_encoder): VitsTextEncoder(
+    (embed_tokens): Embedding(95, 192)
+    (encoder): VitsEncoder(
+      (layers): ModuleList(
+        (0-5): 6 x VitsEncoderLayer(
+          (attention): VitsAttention(
+            (k_proj): Linear(in_features=192, out_features=192, bias=True)
+            (v_proj): Linear(in_features=192, out_features=192, bias=True)
+            (q_proj): Linear(in_features=192, out_features=192, bias=True)
+            (out_proj): Linear(in_features=192, out_features=192, bias=True)
+          )
+          (dropout): Dropout(p=0.1, inplace=False)
+          (layer_norm): LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+          (feed_forward): VitsFeedForward(
+            (conv_1): Conv1d(192, 768, kernel_size=(3,), stride=(1,))
+            (conv_2): Conv1d(768, 192, kernel_size=(3,), stride=(1,))
+            (dropout): Dropout(p=0.1, inplace=False)
+            (act_fn): ReLU()
+          )
+          (final_layer_norm): LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+    )
+    (project): Conv1d(192, 384, kernel_size=(1,), stride=(1,))
+  )
+  (flow): VitsResidualCouplingBlock(
+    (flows): ModuleList(
+      (0-3): 4 x VitsResidualCouplingLayer(
+        (conv_pre): Conv1d(96, 192, kernel_size=(1,), stride=(1,))
+        (wavenet): VitsWaveNet(
+          (in_layers): ModuleList(
+            (0-3): 4 x ParametrizedConv1d(
+              192, 384, kernel_size=(5,), stride=(1,), padding=(2,)
+              (parametrizations): ModuleDict(
+                (weight): ParametrizationList(
+                  (0): _WeightNorm()
+                )
+              )
+            )
+          )
+          (res_skip_layers): ModuleList(
+            (0-2): 3 x ParametrizedConv1d(
+              192, 384, kernel_size=(1,), stride=(1,)
+              (parametrizations): ModuleDict(
+                (weight): ParametrizationList(
+                  (0): _WeightNorm()
+                )
+              )
+            )
+            (3): ParametrizedConv1d(
+              192, 192, kernel_size=(1,), stride=(1,)
+              (parametrizations): ModuleDict(
+                (weight): ParametrizationList(
+                  (0): _WeightNorm()
+                )
+              )
+            )
+          )
+          (dropout): Dropout(p=0.0, inplace=False)
+        )
+        (conv_post): Conv1d(192, 96, kernel_size=(1,), stride=(1,))
+      )
+    )
+  )
+  (decoder): VitsHifiGan(
+    (conv_pre): Conv1d(192, 512, kernel_size=(7,), stride=(1,), padding=(3,))
+    (upsampler): ModuleList(
+      (0): ConvTranspose1d(512, 256, kernel_size=(16,), stride=(8,), padding=(4,))
+      (1): ConvTranspose1d(256, 128, kernel_size=(16,), stride=(8,), padding=(4,))
+      (2): ConvTranspose1d(128, 64, kernel_size=(4,), stride=(2,), padding=(1,))
+      (3): ConvTranspose1d(64, 32, kernel_size=(4,), stride=(2,), padding=(1,))
+    )
+    (resblocks): ModuleList(
+      (0): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(256, 256, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): Conv1d(256, 256, kernel_size=(3,), stride=(1,), padding=(3,), dilation=(3,))
+          (2): Conv1d(256, 256, kernel_size=(3,), stride=(1,), padding=(5,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(256, 256, kernel_size=(3,), stride=(1,), padding=(1,))
+        )
+      )
+      (1): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(256, 256, kernel_size=(7,), stride=(1,), padding=(3,))
+          (1): Conv1d(256, 256, kernel_size=(7,), stride=(1,), padding=(9,), dilation=(3,))
+          (2): Conv1d(256, 256, kernel_size=(7,), stride=(1,), padding=(15,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(256, 256, kernel_size=(7,), stride=(1,), padding=(3,))
+        )
+      )
+      (2): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(256, 256, kernel_size=(11,), stride=(1,), padding=(5,))
+          (1): Conv1d(256, 256, kernel_size=(11,), stride=(1,), padding=(15,), dilation=(3,))
+          (2): Conv1d(256, 256, kernel_size=(11,), stride=(1,), padding=(25,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(256, 256, kernel_size=(11,), stride=(1,), padding=(5,))
+        )
+      )
+      (3): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(128, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): Conv1d(128, 128, kernel_size=(3,), stride=(1,), padding=(3,), dilation=(3,))
+          (2): Conv1d(128, 128, kernel_size=(3,), stride=(1,), padding=(5,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(128, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+        )
+      )
+      (4): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(128, 128, kernel_size=(7,), stride=(1,), padding=(3,))
+          (1): Conv1d(128, 128, kernel_size=(7,), stride=(1,), padding=(9,), dilation=(3,))
+          (2): Conv1d(128, 128, kernel_size=(7,), stride=(1,), padding=(15,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(128, 128, kernel_size=(7,), stride=(1,), padding=(3,))
+        )
+      )
+      (5): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(128, 128, kernel_size=(11,), stride=(1,), padding=(5,))
+          (1): Conv1d(128, 128, kernel_size=(11,), stride=(1,), padding=(15,), dilation=(3,))
+          (2): Conv1d(128, 128, kernel_size=(11,), stride=(1,), padding=(25,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(128, 128, kernel_size=(11,), stride=(1,), padding=(5,))
+        )
+      )
+      (6): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(64, 64, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): Conv1d(64, 64, kernel_size=(3,), stride=(1,), padding=(3,), dilation=(3,))
+          (2): Conv1d(64, 64, kernel_size=(3,), stride=(1,), padding=(5,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(64, 64, kernel_size=(3,), stride=(1,), padding=(1,))
+        )
+      )
+      (7): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(64, 64, kernel_size=(7,), stride=(1,), padding=(3,))
+          (1): Conv1d(64, 64, kernel_size=(7,), stride=(1,), padding=(9,), dilation=(3,))
+          (2): Conv1d(64, 64, kernel_size=(7,), stride=(1,), padding=(15,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(64, 64, kernel_size=(7,), stride=(1,), padding=(3,))
+        )
+      )
+      (8): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(64, 64, kernel_size=(11,), stride=(1,), padding=(5,))
+          (1): Conv1d(64, 64, kernel_size=(11,), stride=(1,), padding=(15,), dilation=(3,))
+          (2): Conv1d(64, 64, kernel_size=(11,), stride=(1,), padding=(25,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(64, 64, kernel_size=(11,), stride=(1,), padding=(5,))
+        )
+      )
+      (9): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(32, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): Conv1d(32, 32, kernel_size=(3,), stride=(1,), padding=(3,), dilation=(3,))
+          (2): Conv1d(32, 32, kernel_size=(3,), stride=(1,), padding=(5,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(32, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+        )
+      )
+      (10): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(32, 32, kernel_size=(7,), stride=(1,), padding=(3,))
+          (1): Conv1d(32, 32, kernel_size=(7,), stride=(1,), padding=(9,), dilation=(3,))
+          (2): Conv1d(32, 32, kernel_size=(7,), stride=(1,), padding=(15,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(32, 32, kernel_size=(7,), stride=(1,), padding=(3,))
+        )
+      )
+      (11): HifiGanResidualBlock(
+        (convs1): ModuleList(
+          (0): Conv1d(32, 32, kernel_size=(11,), stride=(1,), padding=(5,))
+          (1): Conv1d(32, 32, kernel_size=(11,), stride=(1,), padding=(15,), dilation=(3,))
+          (2): Conv1d(32, 32, kernel_size=(11,), stride=(1,), padding=(25,), dilation=(5,))
+        )
+        (convs2): ModuleList(
+          (0-2): 3 x Conv1d(32, 32, kernel_size=(11,), stride=(1,), padding=(5,))
+        )
+      )
+    )
+    (conv_post): Conv1d(32, 1, kernel_size=(7,), stride=(1,), padding=(3,), bias=False)
+  )
+  (duration_predictor): VitsStochasticDurationPredictor(
+    (conv_pre): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+    (conv_proj): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+    (conv_dds): VitsDilatedDepthSeparableConv(
+      (dropout): Dropout(p=0.5, inplace=False)
+      (convs_dilated): ModuleList(
+        (0): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(1,), groups=192)
+        (1): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(3,), dilation=(3,), groups=192)
+        (2): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(9,), dilation=(9,), groups=192)
+      )
+      (convs_pointwise): ModuleList(
+        (0-2): 3 x Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+      )
+      (norms_1): ModuleList(
+        (0-2): 3 x LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+      )
+      (norms_2): ModuleList(
+        (0-2): 3 x LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (flows): ModuleList(
+      (0): VitsElementwiseAffine()
+      (1-4): 4 x VitsConvFlow(
+        (conv_pre): Conv1d(1, 192, kernel_size=(1,), stride=(1,))
+        (conv_dds): VitsDilatedDepthSeparableConv(
+          (dropout): Dropout(p=0.0, inplace=False)
+          (convs_dilated): ModuleList(
+            (0): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(1,), groups=192)
+            (1): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(3,), dilation=(3,), groups=192)
+            (2): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(9,), dilation=(9,), groups=192)
+          )
+          (convs_pointwise): ModuleList(
+            (0-2): 3 x Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+          )
+          (norms_1): ModuleList(
+            (0-2): 3 x LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+          )
+          (norms_2): ModuleList(
+            (0-2): 3 x LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+        (conv_proj): Conv1d(192, 29, kernel_size=(1,), stride=(1,))
+      )
+    )
+    (post_conv_pre): Conv1d(1, 192, kernel_size=(1,), stride=(1,))
+    (post_conv_proj): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+    (post_conv_dds): VitsDilatedDepthSeparableConv(
+      (dropout): Dropout(p=0.5, inplace=False)
+      (convs_dilated): ModuleList(
+        (0): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(1,), groups=192)
+        (1): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(3,), dilation=(3,), groups=192)
+        (2): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(9,), dilation=(9,), groups=192)
+      )
+      (convs_pointwise): ModuleList(
+        (0-2): 3 x Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+      )
+      (norms_1): ModuleList(
+        (0-2): 3 x LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+      )
+      (norms_2): ModuleList(
+        (0-2): 3 x LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (post_flows): ModuleList(
+      (0): VitsElementwiseAffine()
+      (1-4): 4 x VitsConvFlow(
+        (conv_pre): Conv1d(1, 192, kernel_size=(1,), stride=(1,))
+        (conv_dds): VitsDilatedDepthSeparableConv(
+          (dropout): Dropout(p=0.0, inplace=False)
+          (convs_dilated): ModuleList(
+            (0): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(1,), groups=192)
+            (1): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(3,), dilation=(3,), groups=192)
+            (2): Conv1d(192, 192, kernel_size=(3,), stride=(1,), padding=(9,), dilation=(9,), groups=192)
+          )
+          (convs_pointwise): ModuleList(
+            (0-2): 3 x Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+          )
+          (norms_1): ModuleList(
+            (0-2): 3 x LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+          )
+          (norms_2): ModuleList(
+            (0-2): 3 x LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+        (conv_proj): Conv1d(192, 29, kernel_size=(1,), stride=(1,))
+      )
+    )
+  )
+  (posterior_encoder): VitsPosteriorEncoder(
+    (conv_pre): Conv1d(513, 192, kernel_size=(1,), stride=(1,))
+    (wavenet): VitsWaveNet(
+      (in_layers): ModuleList(
+        (0-15): 16 x ParametrizedConv1d(
+          192, 384, kernel_size=(5,), stride=(1,), padding=(2,)
+          (parametrizations): ModuleDict(
+            (weight): ParametrizationList(
+              (0): _WeightNorm()
+            )
+          )
+        )
+      )
+      (res_skip_layers): ModuleList(
+        (0-14): 15 x ParametrizedConv1d(
+          192, 384, kernel_size=(1,), stride=(1,)
+          (parametrizations): ModuleDict(
+            (weight): ParametrizationList(
+              (0): _WeightNorm()
+            )
+          )
+        )
+        (15): ParametrizedConv1d(
+          192, 192, kernel_size=(1,), stride=(1,)
+          (parametrizations): ModuleDict(
+            (weight): ParametrizationList(
+              (0): _WeightNorm()
+            )
+          )
+        )
+      )
+      (dropout): Dropout(p=0.0, inplace=False)
+    )
+    (conv_proj): Conv1d(192, 384, kernel_size=(1,), stride=(1,))
+  )
+)

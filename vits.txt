@@ -1,0 +1,585 @@
+├─VitsTextEncoder: 1-1                                       --
+|    └─Embedding: 2-1                                        18,240
+|    └─VitsEncoder: 2-2                                      --
+|    |    └─ModuleList: 3-1                                  --
+|    |    |    └─VitsEncoderLayer: 4-1                       --
+|    |    |    |    └─VitsAttention: 5-1                     --
+|    |    |    |    |    └─Linear: 6-1                       37,056
+|    |    |    |    |    └─Linear: 6-2                       37,056
+|    |    |    |    |    └─Linear: 6-3                       37,056
+|    |    |    |    |    └─Linear: 6-4                       37,056
+|    |    |    |    └─Dropout: 5-2                           --
+|    |    |    |    └─LayerNorm: 5-3                         384
+|    |    |    |    └─VitsFeedForward: 5-4                   --
+|    |    |    |    |    └─Conv1d: 6-5                       443,136
+|    |    |    |    |    └─Conv1d: 6-6                       442,560
+|    |    |    |    |    └─Dropout: 6-7                      --
+|    |    |    |    |    └─ReLU: 6-8                         --
+|    |    |    |    └─LayerNorm: 5-5                         384
+|    |    |    └─VitsEncoderLayer: 4-2                       --
+|    |    |    |    └─VitsAttention: 5-6                     --
+|    |    |    |    |    └─Linear: 6-9                       37,056
+|    |    |    |    |    └─Linear: 6-10                      37,056
+|    |    |    |    |    └─Linear: 6-11                      37,056
+|    |    |    |    |    └─Linear: 6-12                      37,056
+|    |    |    |    └─Dropout: 5-7                           --
+|    |    |    |    └─LayerNorm: 5-8                         384
+|    |    |    |    └─VitsFeedForward: 5-9                   --
+|    |    |    |    |    └─Conv1d: 6-13                      443,136
+|    |    |    |    |    └─Conv1d: 6-14                      442,560
+|    |    |    |    |    └─Dropout: 6-15                     --
+|    |    |    |    |    └─ReLU: 6-16                        --
+|    |    |    |    └─LayerNorm: 5-10                        384
+|    |    |    └─VitsEncoderLayer: 4-3                       --
+|    |    |    |    └─VitsAttention: 5-11                    --
+|    |    |    |    |    └─Linear: 6-17                      37,056
+|    |    |    |    |    └─Linear: 6-18                      37,056
+|    |    |    |    |    └─Linear: 6-19                      37,056
+|    |    |    |    |    └─Linear: 6-20                      37,056
+|    |    |    |    └─Dropout: 5-12                          --
+|    |    |    |    └─LayerNorm: 5-13                        384
+|    |    |    |    └─VitsFeedForward: 5-14                  --
+|    |    |    |    |    └─Conv1d: 6-21                      443,136
+|    |    |    |    |    └─Conv1d: 6-22                      442,560
+|    |    |    |    |    └─Dropout: 6-23                     --
+|    |    |    |    |    └─ReLU: 6-24                        --
+|    |    |    |    └─LayerNorm: 5-15                        384
+|    |    |    └─VitsEncoderLayer: 4-4                       --
+|    |    |    |    └─VitsAttention: 5-16                    --
+|    |    |    |    |    └─Linear: 6-25                      37,056
+|    |    |    |    |    └─Linear: 6-26                      37,056
+|    |    |    |    |    └─Linear: 6-27                      37,056
+|    |    |    |    |    └─Linear: 6-28                      37,056
+|    |    |    |    └─Dropout: 5-17                          --
+|    |    |    |    └─LayerNorm: 5-18                        384
+|    |    |    |    └─VitsFeedForward: 5-19                  --
+|    |    |    |    |    └─Conv1d: 6-29                      443,136
+|    |    |    |    |    └─Conv1d: 6-30                      442,560
+|    |    |    |    |    └─Dropout: 6-31                     --
+|    |    |    |    |    └─ReLU: 6-32                        --
+|    |    |    |    └─LayerNorm: 5-20                        384
+|    |    |    └─VitsEncoderLayer: 4-5                       --
+|    |    |    |    └─VitsAttention: 5-21                    --
+|    |    |    |    |    └─Linear: 6-33                      37,056
+|    |    |    |    |    └─Linear: 6-34                      37,056
+|    |    |    |    |    └─Linear: 6-35                      37,056
+|    |    |    |    |    └─Linear: 6-36                      37,056
+|    |    |    |    └─Dropout: 5-22                          --
+|    |    |    |    └─LayerNorm: 5-23                        384
+|    |    |    |    └─VitsFeedForward: 5-24                  --
+|    |    |    |    |    └─Conv1d: 6-37                      443,136
+|    |    |    |    |    └─Conv1d: 6-38                      442,560
+|    |    |    |    |    └─Dropout: 6-39                     --
+|    |    |    |    |    └─ReLU: 6-40                        --
+|    |    |    |    └─LayerNorm: 5-25                        384
+|    |    |    └─VitsEncoderLayer: 4-6                       --
+|    |    |    |    └─VitsAttention: 5-26                    --
+|    |    |    |    |    └─Linear: 6-41                      37,056
+|    |    |    |    |    └─Linear: 6-42                      37,056
+|    |    |    |    |    └─Linear: 6-43                      37,056
+|    |    |    |    |    └─Linear: 6-44                      37,056
+|    |    |    |    └─Dropout: 5-27                          --
+|    |    |    |    └─LayerNorm: 5-28                        384
+|    |    |    |    └─VitsFeedForward: 5-29                  --
+|    |    |    |    |    └─Conv1d: 6-45                      443,136
+|    |    |    |    |    └─Conv1d: 6-46                      442,560
+|    |    |    |    |    └─Dropout: 6-47                     --
+|    |    |    |    |    └─ReLU: 6-48                        --
+|    |    |    |    └─LayerNorm: 5-30                        384
+|    └─Conv1d: 2-3                                           74,112
+├─VitsResidualCouplingBlock: 1-2                             --
+|    └─ModuleList: 2-4                                       --
+|    |    └─VitsResidualCouplingLayer: 3-2                   --
+|    |    |    └─Conv1d: 4-7                                 18,624
+|    |    |    └─VitsWaveNet: 4-8                            --
+|    |    |    |    └─ModuleList: 5-31                       --
+|    |    |    |    |    └─ParametrizedConv1d: 6-49          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-50          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-51          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-52          369,408
+|    |    |    |    └─ModuleList: 5-32                       --
+|    |    |    |    |    └─ParametrizedConv1d: 6-53          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-54          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-55          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-56          37,248
+|    |    |    |    └─Dropout: 5-33                          --
+|    |    |    └─Conv1d: 4-9                                 18,528
+|    |    └─VitsResidualCouplingLayer: 3-3                   --
+|    |    |    └─Conv1d: 4-10                                18,624
+|    |    |    └─VitsWaveNet: 4-11                           --
+|    |    |    |    └─ModuleList: 5-34                       --
+|    |    |    |    |    └─ParametrizedConv1d: 6-57          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-58          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-59          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-60          369,408
+|    |    |    |    └─ModuleList: 5-35                       --
+|    |    |    |    |    └─ParametrizedConv1d: 6-61          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-62          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-63          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-64          37,248
+|    |    |    |    └─Dropout: 5-36                          --
+|    |    |    └─Conv1d: 4-12                                18,528
+|    |    └─VitsResidualCouplingLayer: 3-4                   --
+|    |    |    └─Conv1d: 4-13                                18,624
+|    |    |    └─VitsWaveNet: 4-14                           --
+|    |    |    |    └─ModuleList: 5-37                       --
+|    |    |    |    |    └─ParametrizedConv1d: 6-65          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-66          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-67          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-68          369,408
+|    |    |    |    └─ModuleList: 5-38                       --
+|    |    |    |    |    └─ParametrizedConv1d: 6-69          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-70          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-71          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-72          37,248
+|    |    |    |    └─Dropout: 5-39                          --
+|    |    |    └─Conv1d: 4-15                                18,528
+|    |    └─VitsResidualCouplingLayer: 3-5                   --
+|    |    |    └─Conv1d: 4-16                                18,624
+|    |    |    └─VitsWaveNet: 4-17                           --
+|    |    |    |    └─ModuleList: 5-40                       --
+|    |    |    |    |    └─ParametrizedConv1d: 6-73          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-74          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-75          369,408
+|    |    |    |    |    └─ParametrizedConv1d: 6-76          369,408
+|    |    |    |    └─ModuleList: 5-41                       --
+|    |    |    |    |    └─ParametrizedConv1d: 6-77          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-78          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-79          74,496
+|    |    |    |    |    └─ParametrizedConv1d: 6-80          37,248
+|    |    |    |    └─Dropout: 5-42                          --
+|    |    |    └─Conv1d: 4-18                                18,528
+├─VitsHifiGan: 1-3                                           --
+|    └─Conv1d: 2-5                                           688,640
+|    └─ModuleList: 2-6                                       --
+|    |    └─ConvTranspose1d: 3-6                             2,097,408
+|    |    └─ConvTranspose1d: 3-7                             524,416
+|    |    └─ConvTranspose1d: 3-8                             32,832
+|    |    └─ConvTranspose1d: 3-9                             8,224
+|    └─ModuleList: 2-7                                       --
+|    |    └─HifiGanResidualBlock: 3-10                       --
+|    |    |    └─ModuleList: 4-19                            --
+|    |    |    |    └─Conv1d: 5-43                           196,864
+|    |    |    |    └─Conv1d: 5-44                           196,864
+|    |    |    |    └─Conv1d: 5-45                           196,864
+|    |    |    └─ModuleList: 4-20                            --
+|    |    |    |    └─Conv1d: 5-46                           196,864
+|    |    |    |    └─Conv1d: 5-47                           196,864
+|    |    |    |    └─Conv1d: 5-48                           196,864
+|    |    └─HifiGanResidualBlock: 3-11                       --
+|    |    |    └─ModuleList: 4-21                            --
+|    |    |    |    └─Conv1d: 5-49                           459,008
+|    |    |    |    └─Conv1d: 5-50                           459,008
+|    |    |    |    └─Conv1d: 5-51                           459,008
+|    |    |    └─ModuleList: 4-22                            --
+|    |    |    |    └─Conv1d: 5-52                           459,008
+|    |    |    |    └─Conv1d: 5-53                           459,008
+|    |    |    |    └─Conv1d: 5-54                           459,008
+|    |    └─HifiGanResidualBlock: 3-12                       --
+|    |    |    └─ModuleList: 4-23                            --
+|    |    |    |    └─Conv1d: 5-55                           721,152
+|    |    |    |    └─Conv1d: 5-56                           721,152
+|    |    |    |    └─Conv1d: 5-57                           721,152
+|    |    |    └─ModuleList: 4-24                            --
+|    |    |    |    └─Conv1d: 5-58                           721,152
+|    |    |    |    └─Conv1d: 5-59                           721,152
+|    |    |    |    └─Conv1d: 5-60                           721,152
+|    |    └─HifiGanResidualBlock: 3-13                       --
+|    |    |    └─ModuleList: 4-25                            --
+|    |    |    |    └─Conv1d: 5-61                           49,280
+|    |    |    |    └─Conv1d: 5-62                           49,280
+|    |    |    |    └─Conv1d: 5-63                           49,280
+|    |    |    └─ModuleList: 4-26                            --
+|    |    |    |    └─Conv1d: 5-64                           49,280
+|    |    |    |    └─Conv1d: 5-65                           49,280
+|    |    |    |    └─Conv1d: 5-66                           49,280
+|    |    └─HifiGanResidualBlock: 3-14                       --
+|    |    |    └─ModuleList: 4-27                            --
+|    |    |    |    └─Conv1d: 5-67                           114,816
+|    |    |    |    └─Conv1d: 5-68                           114,816
+|    |    |    |    └─Conv1d: 5-69                           114,816
+|    |    |    └─ModuleList: 4-28                            --
+|    |    |    |    └─Conv1d: 5-70                           114,816
+|    |    |    |    └─Conv1d: 5-71                           114,816
+|    |    |    |    └─Conv1d: 5-72                           114,816
+|    |    └─HifiGanResidualBlock: 3-15                       --
+|    |    |    └─ModuleList: 4-29                            --
+|    |    |    |    └─Conv1d: 5-73                           180,352
+|    |    |    |    └─Conv1d: 5-74                           180,352
+|    |    |    |    └─Conv1d: 5-75                           180,352
+|    |    |    └─ModuleList: 4-30                            --
+|    |    |    |    └─Conv1d: 5-76                           180,352
+|    |    |    |    └─Conv1d: 5-77                           180,352
+|    |    |    |    └─Conv1d: 5-78                           180,352
+|    |    └─HifiGanResidualBlock: 3-16                       --
+|    |    |    └─ModuleList: 4-31                            --
+|    |    |    |    └─Conv1d: 5-79                           12,352
+|    |    |    |    └─Conv1d: 5-80                           12,352
+|    |    |    |    └─Conv1d: 5-81                           12,352
+|    |    |    └─ModuleList: 4-32                            --
+|    |    |    |    └─Conv1d: 5-82                           12,352
+|    |    |    |    └─Conv1d: 5-83                           12,352
+|    |    |    |    └─Conv1d: 5-84                           12,352
+|    |    └─HifiGanResidualBlock: 3-17                       --
+|    |    |    └─ModuleList: 4-33                            --
+|    |    |    |    └─Conv1d: 5-85                           28,736
+|    |    |    |    └─Conv1d: 5-86                           28,736
+|    |    |    |    └─Conv1d: 5-87                           28,736
+|    |    |    └─ModuleList: 4-34                            --
+|    |    |    |    └─Conv1d: 5-88                           28,736
+|    |    |    |    └─Conv1d: 5-89                           28,736
+|    |    |    |    └─Conv1d: 5-90                           28,736
+|    |    └─HifiGanResidualBlock: 3-18                       --
+|    |    |    └─ModuleList: 4-35                            --
+|    |    |    |    └─Conv1d: 5-91                           45,120
+|    |    |    |    └─Conv1d: 5-92                           45,120
+|    |    |    |    └─Conv1d: 5-93                           45,120
+|    |    |    └─ModuleList: 4-36                            --
+|    |    |    |    └─Conv1d: 5-94                           45,120
+|    |    |    |    └─Conv1d: 5-95                           45,120
+|    |    |    |    └─Conv1d: 5-96                           45,120
+|    |    └─HifiGanResidualBlock: 3-19                       --
+|    |    |    └─ModuleList: 4-37                            --
+|    |    |    |    └─Conv1d: 5-97                           3,104
+|    |    |    |    └─Conv1d: 5-98                           3,104
+|    |    |    |    └─Conv1d: 5-99                           3,104
+|    |    |    └─ModuleList: 4-38                            --
+|    |    |    |    └─Conv1d: 5-100                          3,104
+|    |    |    |    └─Conv1d: 5-101                          3,104
+|    |    |    |    └─Conv1d: 5-102                          3,104
+|    |    └─HifiGanResidualBlock: 3-20                       --
+|    |    |    └─ModuleList: 4-39                            --
+|    |    |    |    └─Conv1d: 5-103                          7,200
+|    |    |    |    └─Conv1d: 5-104                          7,200
+|    |    |    |    └─Conv1d: 5-105                          7,200
+|    |    |    └─ModuleList: 4-40                            --
+|    |    |    |    └─Conv1d: 5-106                          7,200
+|    |    |    |    └─Conv1d: 5-107                          7,200
+|    |    |    |    └─Conv1d: 5-108                          7,200
+|    |    └─HifiGanResidualBlock: 3-21                       --
+|    |    |    └─ModuleList: 4-41                            --
+|    |    |    |    └─Conv1d: 5-109                          11,296
+|    |    |    |    └─Conv1d: 5-110                          11,296
+|    |    |    |    └─Conv1d: 5-111                          11,296
+|    |    |    └─ModuleList: 4-42                            --
+|    |    |    |    └─Conv1d: 5-112                          11,296
+|    |    |    |    └─Conv1d: 5-113                          11,296
+|    |    |    |    └─Conv1d: 5-114                          11,296
+|    └─Conv1d: 2-8                                           224
+├─VitsStochasticDurationPredictor: 1-4                       --
+|    └─Conv1d: 2-9                                           37,056
+|    └─Conv1d: 2-10                                          37,056
+|    └─VitsDilatedDepthSeparableConv: 2-11                   --
+|    |    └─Dropout: 3-22                                    --
+|    |    └─ModuleList: 3-23                                 --
+|    |    |    └─Conv1d: 4-43                                768
+|    |    |    └─Conv1d: 4-44                                768
+|    |    |    └─Conv1d: 4-45                                768
+|    |    └─ModuleList: 3-24                                 --
+|    |    |    └─Conv1d: 4-46                                37,056
+|    |    |    └─Conv1d: 4-47                                37,056
+|    |    |    └─Conv1d: 4-48                                37,056
+|    |    └─ModuleList: 3-25                                 --
+|    |    |    └─LayerNorm: 4-49                             384
+|    |    |    └─LayerNorm: 4-50                             384
+|    |    |    └─LayerNorm: 4-51                             384
+|    |    └─ModuleList: 3-26                                 --
+|    |    |    └─LayerNorm: 4-52                             384
+|    |    |    └─LayerNorm: 4-53                             384
+|    |    |    └─LayerNorm: 4-54                             384
+|    └─ModuleList: 2-12                                      --
+|    |    └─VitsElementwiseAffine: 3-27                      4
+|    |    └─VitsConvFlow: 3-28                               --
+|    |    |    └─Conv1d: 4-55                                384
+|    |    |    └─VitsDilatedDepthSeparableConv: 4-56         --
+|    |    |    |    └─Dropout: 5-115                         --
+|    |    |    |    └─ModuleList: 5-116                      --
+|    |    |    |    |    └─Conv1d: 6-81                      768
+|    |    |    |    |    └─Conv1d: 6-82                      768
+|    |    |    |    |    └─Conv1d: 6-83                      768
+|    |    |    |    └─ModuleList: 5-117                      --
+|    |    |    |    |    └─Conv1d: 6-84                      37,056
+|    |    |    |    |    └─Conv1d: 6-85                      37,056
+|    |    |    |    |    └─Conv1d: 6-86                      37,056
+|    |    |    |    └─ModuleList: 5-118                      --
+|    |    |    |    |    └─LayerNorm: 6-87                   384
+|    |    |    |    |    └─LayerNorm: 6-88                   384
+|    |    |    |    |    └─LayerNorm: 6-89                   384
+|    |    |    |    └─ModuleList: 5-119                      --
+|    |    |    |    |    └─LayerNorm: 6-90                   384
+|    |    |    |    |    └─LayerNorm: 6-91                   384
+|    |    |    |    |    └─LayerNorm: 6-92                   384
+|    |    |    └─Conv1d: 4-57                                5,597
+|    |    └─VitsConvFlow: 3-29                               --
+|    |    |    └─Conv1d: 4-58                                384
+|    |    |    └─VitsDilatedDepthSeparableConv: 4-59         --
+|    |    |    |    └─Dropout: 5-120                         --
+|    |    |    |    └─ModuleList: 5-121                      --
+|    |    |    |    |    └─Conv1d: 6-93                      768
+|    |    |    |    |    └─Conv1d: 6-94                      768
+|    |    |    |    |    └─Conv1d: 6-95                      768
+|    |    |    |    └─ModuleList: 5-122                      --
+|    |    |    |    |    └─Conv1d: 6-96                      37,056
+|    |    |    |    |    └─Conv1d: 6-97                      37,056
+|    |    |    |    |    └─Conv1d: 6-98                      37,056
+|    |    |    |    └─ModuleList: 5-123                      --
+|    |    |    |    |    └─LayerNorm: 6-99                   384
+|    |    |    |    |    └─LayerNorm: 6-100                  384
+|    |    |    |    |    └─LayerNorm: 6-101                  384
+|    |    |    |    └─ModuleList: 5-124                      --
+|    |    |    |    |    └─LayerNorm: 6-102                  384
+|    |    |    |    |    └─LayerNorm: 6-103                  384
+|    |    |    |    |    └─LayerNorm: 6-104                  384
+|    |    |    └─Conv1d: 4-60                                5,597
+|    |    └─VitsConvFlow: 3-30                               --
+|    |    |    └─Conv1d: 4-61                                384
+|    |    |    └─VitsDilatedDepthSeparableConv: 4-62         --
+|    |    |    |    └─Dropout: 5-125                         --
+|    |    |    |    └─ModuleList: 5-126                      --
+|    |    |    |    |    └─Conv1d: 6-105                     768
+|    |    |    |    |    └─Conv1d: 6-106                     768
+|    |    |    |    |    └─Conv1d: 6-107                     768
+|    |    |    |    └─ModuleList: 5-127                      --
+|    |    |    |    |    └─Conv1d: 6-108                     37,056
+|    |    |    |    |    └─Conv1d: 6-109                     37,056
+|    |    |    |    |    └─Conv1d: 6-110                     37,056
+|    |    |    |    └─ModuleList: 5-128                      --
+|    |    |    |    |    └─LayerNorm: 6-111                  384
+|    |    |    |    |    └─LayerNorm: 6-112                  384
+|    |    |    |    |    └─LayerNorm: 6-113                  384
+|    |    |    |    └─ModuleList: 5-129                      --
+|    |    |    |    |    └─LayerNorm: 6-114                  384
+|    |    |    |    |    └─LayerNorm: 6-115                  384
+|    |    |    |    |    └─LayerNorm: 6-116                  384
+|    |    |    └─Conv1d: 4-63                                5,597
+|    |    └─VitsConvFlow: 3-31                               --
+|    |    |    └─Conv1d: 4-64                                384
+|    |    |    └─VitsDilatedDepthSeparableConv: 4-65         --
+|    |    |    |    └─Dropout: 5-130                         --
+|    |    |    |    └─ModuleList: 5-131                      --
+|    |    |    |    |    └─Conv1d: 6-117                     768
+|    |    |    |    |    └─Conv1d: 6-118                     768
+|    |    |    |    |    └─Conv1d: 6-119                     768
+|    |    |    |    └─ModuleList: 5-132                      --
+|    |    |    |    |    └─Conv1d: 6-120                     37,056
+|    |    |    |    |    └─Conv1d: 6-121                     37,056
+|    |    |    |    |    └─Conv1d: 6-122                     37,056
+|    |    |    |    └─ModuleList: 5-133                      --
+|    |    |    |    |    └─LayerNorm: 6-123                  384
+|    |    |    |    |    └─LayerNorm: 6-124                  384
+|    |    |    |    |    └─LayerNorm: 6-125                  384
+|    |    |    |    └─ModuleList: 5-134                      --
+|    |    |    |    |    └─LayerNorm: 6-126                  384
+|    |    |    |    |    └─LayerNorm: 6-127                  384
+|    |    |    |    |    └─LayerNorm: 6-128                  384
+|    |    |    └─Conv1d: 4-66                                5,597
+|    └─Conv1d: 2-13                                          384
+|    └─Conv1d: 2-14                                          37,056
+|    └─VitsDilatedDepthSeparableConv: 2-15                   --
+|    |    └─Dropout: 3-32                                    --
+|    |    └─ModuleList: 3-33                                 --
+|    |    |    └─Conv1d: 4-67                                768
+|    |    |    └─Conv1d: 4-68                                768
+|    |    |    └─Conv1d: 4-69                                768
+|    |    └─ModuleList: 3-34                                 --
+|    |    |    └─Conv1d: 4-70                                37,056
+|    |    |    └─Conv1d: 4-71                                37,056
+|    |    |    └─Conv1d: 4-72                                37,056
+|    |    └─ModuleList: 3-35                                 --
+|    |    |    └─LayerNorm: 4-73                             384
+|    |    |    └─LayerNorm: 4-74                             384
+|    |    |    └─LayerNorm: 4-75                             384
+|    |    └─ModuleList: 3-36                                 --
+|    |    |    └─LayerNorm: 4-76                             384
+|    |    |    └─LayerNorm: 4-77                             384
+|    |    |    └─LayerNorm: 4-78                             384
+|    └─ModuleList: 2-16                                      --
+|    |    └─VitsElementwiseAffine: 3-37                      4
+|    |    └─VitsConvFlow: 3-38                               --
+|    |    |    └─Conv1d: 4-79                                384
+|    |    |    └─VitsDilatedDepthSeparableConv: 4-80         --
+|    |    |    |    └─Dropout: 5-135                         --
+|    |    |    |    └─ModuleList: 5-136                      --
+|    |    |    |    |    └─Conv1d: 6-129                     768
+|    |    |    |    |    └─Conv1d: 6-130                     768
+|    |    |    |    |    └─Conv1d: 6-131                     768
+|    |    |    |    └─ModuleList: 5-137                      --
+|    |    |    |    |    └─Conv1d: 6-132                     37,056
+|    |    |    |    |    └─Conv1d: 6-133                     37,056
+|    |    |    |    |    └─Conv1d: 6-134                     37,056
+|    |    |    |    └─ModuleList: 5-138                      --
+|    |    |    |    |    └─LayerNorm: 6-135                  384
+|    |    |    |    |    └─LayerNorm: 6-136                  384
+|    |    |    |    |    └─LayerNorm: 6-137                  384
+|    |    |    |    └─ModuleList: 5-139                      --
+|    |    |    |    |    └─LayerNorm: 6-138                  384
+|    |    |    |    |    └─LayerNorm: 6-139                  384
+|    |    |    |    |    └─LayerNorm: 6-140                  384
+|    |    |    └─Conv1d: 4-81                                5,597
+|    |    └─VitsConvFlow: 3-39                               --
+|    |    |    └─Conv1d: 4-82                                384
+|    |    |    └─VitsDilatedDepthSeparableConv: 4-83         --
+|    |    |    |    └─Dropout: 5-140                         --
+|    |    |    |    └─ModuleList: 5-141                      --
+|    |    |    |    |    └─Conv1d: 6-141                     768
+|    |    |    |    |    └─Conv1d: 6-142                     768
+|    |    |    |    |    └─Conv1d: 6-143                     768
+|    |    |    |    └─ModuleList: 5-142                      --
+|    |    |    |    |    └─Conv1d: 6-144                     37,056
+|    |    |    |    |    └─Conv1d: 6-145                     37,056
+|    |    |    |    |    └─Conv1d: 6-146                     37,056
+|    |    |    |    └─ModuleList: 5-143                      --
+|    |    |    |    |    └─LayerNorm: 6-147                  384
+|    |    |    |    |    └─LayerNorm: 6-148                  384
+|    |    |    |    |    └─LayerNorm: 6-149                  384
+|    |    |    |    └─ModuleList: 5-144                      --
+|    |    |    |    |    └─LayerNorm: 6-150                  384
+|    |    |    |    |    └─LayerNorm: 6-151                  384
+|    |    |    |    |    └─LayerNorm: 6-152                  384
+|    |    |    └─Conv1d: 4-84                                5,597
+|    |    └─VitsConvFlow: 3-40                               --
+|    |    |    └─Conv1d: 4-85                                384
+|    |    |    └─VitsDilatedDepthSeparableConv: 4-86         --
+|    |    |    |    └─Dropout: 5-145                         --
+|    |    |    |    └─ModuleList: 5-146                      --
+|    |    |    |    |    └─Conv1d: 6-153                     768
+|    |    |    |    |    └─Conv1d: 6-154                     768
+|    |    |    |    |    └─Conv1d: 6-155                     768
+|    |    |    |    └─ModuleList: 5-147                      --
+|    |    |    |    |    └─Conv1d: 6-156                     37,056
+|    |    |    |    |    └─Conv1d: 6-157                     37,056
+|    |    |    |    |    └─Conv1d: 6-158                     37,056
+|    |    |    |    └─ModuleList: 5-148                      --
+|    |    |    |    |    └─LayerNorm: 6-159                  384
+|    |    |    |    |    └─LayerNorm: 6-160                  384
+|    |    |    |    |    └─LayerNorm: 6-161                  384
+|    |    |    |    └─ModuleList: 5-149                      --
+|    |    |    |    |    └─LayerNorm: 6-162                  384
+|    |    |    |    |    └─LayerNorm: 6-163                  384
+|    |    |    |    |    └─LayerNorm: 6-164                  384
+|    |    |    └─Conv1d: 4-87                                5,597
+|    |    └─VitsConvFlow: 3-41                               --
+|    |    |    └─Conv1d: 4-88                                384
+|    |    |    └─VitsDilatedDepthSeparableConv: 4-89         --
+|    |    |    |    └─Dropout: 5-150                         --
+|    |    |    |    └─ModuleList: 5-151                      --
+|    |    |    |    |    └─Conv1d: 6-165                     768
+|    |    |    |    |    └─Conv1d: 6-166                     768
+|    |    |    |    |    └─Conv1d: 6-167                     768
+|    |    |    |    └─ModuleList: 5-152                      --
+|    |    |    |    |    └─Conv1d: 6-168                     37,056
+|    |    |    |    |    └─Conv1d: 6-169                     37,056
+|    |    |    |    |    └─Conv1d: 6-170                     37,056
+|    |    |    |    └─ModuleList: 5-153                      --
+|    |    |    |    |    └─LayerNorm: 6-171                  384
+|    |    |    |    |    └─LayerNorm: 6-172                  384
+|    |    |    |    |    └─LayerNorm: 6-173                  384
+|    |    |    |    └─ModuleList: 5-154                      --
+|    |    |    |    |    └─LayerNorm: 6-174                  384
+|    |    |    |    |    └─LayerNorm: 6-175                  384
+|    |    |    |    |    └─LayerNorm: 6-176                  384
+|    |    |    └─Conv1d: 4-90                                5,597
+├─VitsPosteriorEncoder: 1-5                                  --
+|    └─Conv1d: 2-17                                          98,688
+|    └─VitsWaveNet: 2-18                                     --
+|    |    └─ModuleList: 3-42                                 --
+|    |    |    └─ParametrizedConv1d: 4-91                    --
+|    |    |    |    └─ModuleDict: 5-155                      --
+|    |    |    |    |    └─ParametrizationList: 6-177        369,024
+|    |    |    └─ParametrizedConv1d: 4-92                    --
+|    |    |    |    └─ModuleDict: 5-156                      --
+|    |    |    |    |    └─ParametrizationList: 6-178        369,024
+|    |    |    └─ParametrizedConv1d: 4-93                    --
+|    |    |    |    └─ModuleDict: 5-157                      --
+|    |    |    |    |    └─ParametrizationList: 6-179        369,024
+|    |    |    └─ParametrizedConv1d: 4-94                    --
+|    |    |    |    └─ModuleDict: 5-158                      --
+|    |    |    |    |    └─ParametrizationList: 6-180        369,024
+|    |    |    └─ParametrizedConv1d: 4-95                    --
+|    |    |    |    └─ModuleDict: 5-159                      --
+|    |    |    |    |    └─ParametrizationList: 6-181        369,024
+|    |    |    └─ParametrizedConv1d: 4-96                    --
+|    |    |    |    └─ModuleDict: 5-160                      --
+|    |    |    |    |    └─ParametrizationList: 6-182        369,024
+|    |    |    └─ParametrizedConv1d: 4-97                    --
+|    |    |    |    └─ModuleDict: 5-161                      --
+|    |    |    |    |    └─ParametrizationList: 6-183        369,024
+|    |    |    └─ParametrizedConv1d: 4-98                    --
+|    |    |    |    └─ModuleDict: 5-162                      --
+|    |    |    |    |    └─ParametrizationList: 6-184        369,024
+|    |    |    └─ParametrizedConv1d: 4-99                    --
+|    |    |    |    └─ModuleDict: 5-163                      --
+|    |    |    |    |    └─ParametrizationList: 6-185        369,024
+|    |    |    └─ParametrizedConv1d: 4-100                   --
+|    |    |    |    └─ModuleDict: 5-164                      --
+|    |    |    |    |    └─ParametrizationList: 6-186        369,024
+|    |    |    └─ParametrizedConv1d: 4-101                   --
+|    |    |    |    └─ModuleDict: 5-165                      --
+|    |    |    |    |    └─ParametrizationList: 6-187        369,024
+|    |    |    └─ParametrizedConv1d: 4-102                   --
+|    |    |    |    └─ModuleDict: 5-166                      --
+|    |    |    |    |    └─ParametrizationList: 6-188        369,024
+|    |    |    └─ParametrizedConv1d: 4-103                   --
+|    |    |    |    └─ModuleDict: 5-167                      --
+|    |    |    |    |    └─ParametrizationList: 6-189        369,024
+|    |    |    └─ParametrizedConv1d: 4-104                   --
+|    |    |    |    └─ModuleDict: 5-168                      --
+|    |    |    |    |    └─ParametrizationList: 6-190        369,024
+|    |    |    └─ParametrizedConv1d: 4-105                   --
+|    |    |    |    └─ModuleDict: 5-169                      --
+|    |    |    |    |    └─ParametrizationList: 6-191        369,024
+|    |    |    └─ParametrizedConv1d: 4-106                   --
+|    |    |    |    └─ModuleDict: 5-170                      --
+|    |    |    |    |    └─ParametrizationList: 6-192        369,024
+|    |    └─ModuleList: 3-43                                 --
+|    |    |    └─ParametrizedConv1d: 4-107                   --
+|    |    |    |    └─ModuleDict: 5-171                      --
+|    |    |    |    |    └─ParametrizationList: 6-193        74,112
+|    |    |    └─ParametrizedConv1d: 4-108                   --
+|    |    |    |    └─ModuleDict: 5-172                      --
+|    |    |    |    |    └─ParametrizationList: 6-194        74,112
+|    |    |    └─ParametrizedConv1d: 4-109                   --
+|    |    |    |    └─ModuleDict: 5-173                      --
+|    |    |    |    |    └─ParametrizationList: 6-195        74,112
+|    |    |    └─ParametrizedConv1d: 4-110                   --
+|    |    |    |    └─ModuleDict: 5-174                      --
+|    |    |    |    |    └─ParametrizationList: 6-196        74,112
+|    |    |    └─ParametrizedConv1d: 4-111                   --
+|    |    |    |    └─ModuleDict: 5-175                      --
+|    |    |    |    |    └─ParametrizationList: 6-197        74,112
+|    |    |    └─ParametrizedConv1d: 4-112                   --
+|    |    |    |    └─ModuleDict: 5-176                      --
+|    |    |    |    |    └─ParametrizationList: 6-198        74,112
+|    |    |    └─ParametrizedConv1d: 4-113                   --
+|    |    |    |    └─ModuleDict: 5-177                      --
+|    |    |    |    |    └─ParametrizationList: 6-199        74,112
+|    |    |    └─ParametrizedConv1d: 4-114                   --
+|    |    |    |    └─ModuleDict: 5-178                      --
+|    |    |    |    |    └─ParametrizationList: 6-200        74,112
+|    |    |    └─ParametrizedConv1d: 4-115                   --
+|    |    |    |    └─ModuleDict: 5-179                      --
+|    |    |    |    |    └─ParametrizationList: 6-201        74,112
+|    |    |    └─ParametrizedConv1d: 4-116                   --
+|    |    |    |    └─ModuleDict: 5-180                      --
+|    |    |    |    |    └─ParametrizationList: 6-202        74,112
+|    |    |    └─ParametrizedConv1d: 4-117                   --
+|    |    |    |    └─ModuleDict: 5-181                      --
+|    |    |    |    |    └─ParametrizationList: 6-203        74,112
+|    |    |    └─ParametrizedConv1d: 4-118                   --
+|    |    |    |    └─ModuleDict: 5-182                      --
+|    |    |    |    |    └─ParametrizationList: 6-204        74,112
+|    |    |    └─ParametrizedConv1d: 4-119                   --
+|    |    |    |    └─ModuleDict: 5-183                      --
+|    |    |    |    |    └─ParametrizationList: 6-205        74,112
+|    |    |    └─ParametrizedConv1d: 4-120                   --
+|    |    |    |    └─ModuleDict: 5-184                      --
+|    |    |    |    |    └─ParametrizationList: 6-206        74,112
+|    |    |    └─ParametrizedConv1d: 4-121                   --
+|    |    |    |    └─ModuleDict: 5-185                      --
+|    |    |    |    |    └─ParametrizationList: 6-207        74,112
+|    |    |    └─ParametrizedConv1d: 4-122                   --
+|    |    |    |    └─ModuleDict: 5-186                      --
+|    |    |    |    |    └─ParametrizationList: 6-208        37,056
+|    |    └─Dropout: 3-44                                    --
+|    └─Conv1d: 2-19                                          74,112
+=====================================================================================
