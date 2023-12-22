@@ -2,8 +2,18 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+class DDSConv(nn.Module):
+    def __init__(self, n_layers: int, channels: int, kernel_size: int, dropout_rate: float) -> None:
+        super().__init__()
+        self.convolutions = nn.ModuleList([DDSConvLayer(i, channels, kernel_size, dropout_rate) for i in range(n_layers)])
+
+    def forward(self, x: torch.Tensor):
+        for conv in self.convolutions:
+            x = conv(x)
+        return x
+
 class DDSConvLayer(nn.Module):
-    def __init__(self, index: int, channels: int, kernel_size: int) -> None:
+    def __init__(self, index: int, channels: int, kernel_size: int, dropout_rate: float) -> None:
         super().__init__()
         dilation = kernel_size ** index
         padding = (kernel_size * dilation - dilation) // 2
@@ -12,6 +22,8 @@ class DDSConvLayer(nn.Module):
         self.norm_1 = nn.LayerNorm(normalized_shape=channels)
         self.conv_1x1 = nn.Conv1d(in_channels=channels, out_channels=channels, kernel_size=1)
         self.norm_2 = nn.LayerNorm(normalized_shape=channels)
+
+        self.dropout = nn.Dropout(p=dropout_rate)
     
     def forward(self, x: torch.Tensor):
         res = x
@@ -20,6 +32,7 @@ class DDSConvLayer(nn.Module):
         x = F.gelu(self.norm_1(x))
         x = self.conv_1x1(x)
         x = F.gelu(self.norm_2(x))
+        x = self.dropout(x)
 
         return x + res
 
