@@ -55,14 +55,13 @@ class Invertible1x1Convolution(nn.Module):
         W = self.conv.weight.squeeze()
 
         if reverse:
-            # Inference
             if not hasattr(self, 'W_inverse'):
                 W_inverse = W.float().inverse()
                 W_inverse = torch.autograd.Variable(W_inverse[..., None])
                 self.W_inverse = W_inverse
             return F.conv1d(x, self.W_inverse, bias=False, stride=1, padding=1)
         else:
-            # Forward
+            # Feed Forward
             log_det_W = batch_size * n_of_groups * torch.logdet(W)
             z = self.conv(z)
             return z, log_det_W

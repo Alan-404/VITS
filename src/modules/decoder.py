@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from typing import Union
-from torch.nn.utils import weight_norm, remove_weight_norm, spectral_norm
+from torch.nn.utils import weight_norm
 
 class Generator(torch.nn.Module):
     def __init__(self, n_mel_channels: int, upsample_rates: Union[list, tuple], upsample_kernel_sizes: Union[list, tuple], upsample_initial_channel: int, resblock_kernel_sizes: Union[list, tuple], resblock_dilation_sizes: Union[list, tuple]):
@@ -46,13 +46,12 @@ class Generator(torch.nn.Module):
         return x
 
     def remove_weight_norm(self):
-        print('Removing weight norm...')
         for l in self.ups:
-            remove_weight_norm(l)
+            nn.utils.remove_weight_norm(l)
         for l in self.resblocks:
-            l.remove_weight_norm()
-        remove_weight_norm(self.conv_pre)
-        remove_weight_norm(self.conv_post)
+            nn.utils.remove_weight_norm(l)
+        nn.utils.remove_weight_norm(self.conv_pre)
+        nn.utils.remove_weight_norm(self.conv_post)
 
 class ResBlock(torch.nn.Module):
     def __init__(self, channels, kernel_size=3, dilation=(1, 3, 5)):
@@ -88,9 +87,9 @@ class ResBlock(torch.nn.Module):
 
     def remove_weight_norm(self):
         for l in self.convs1:
-            remove_weight_norm(l)
+            nn.utils.remove_weight_norm(l)
         for l in self.convs2:
-            remove_weight_norm(l)
+            nn.utils.remove_weight_norm(l)
 
 def get_padding(kernel_size: int, dilation=1):
     return int((kernel_size*dilation - dilation)/2)
