@@ -2,11 +2,28 @@ import torch
 import torch.nn as nn
 from src.utils.position import PositionalEncoding
 from src.utils.transformer import TranformerEncoder
+from src.utils.net import WN
 from typing import Optional
 
 class PosteriorEncoder(nn.Module):
-    def __init__(self) -> None:
+    def __init__(self, n_layers: int, in_channels: int, out_channels: int, hidden_channels: int, kernel_size: int, dilation_rate: int = 2, gin_channels: Optional[int] = None) -> None:
         super().__init__()
+        self.out_channels = out_channels
+
+        self.pre = nn.Conv1d(in_channels=in_channels, out_channels=hidden_channels, kernel_size=1)
+        self.encoder = WN(hidden_channels=hidden_channels, kernel_size=kernel_size, n_layers=n_layers, dilation_rate=dilation_rate, gin_channels=gin_channels)
+        self.proj = nn.Conv1d(in_channels=hidden_channels, out_channels=2*out_channels, kernel_size=1)
+
+    def forward(self, x: torch.Tensor, g: Optional[torch.Tensor] = None):
+        x = self.pre(x)
+        x = self.encoder(x, g)
+        stats = self.proj(x)
+
+        m, logs = torch.split(stats, self.out_channels, dim=1)
+
+        z = m + torch.rand_like(m) * torch.exp(logs)
+
+        return z, m, logs
 
 class PriorEncoder(nn.Module):
     def __init__(self, phoneme_size: int, n: int, d_model: int, heads: int, eps: float, dropout_rate: float) -> None:

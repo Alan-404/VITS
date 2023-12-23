@@ -1,6 +1,16 @@
 import torch
 import torch.nn as nn
 
+class LayerNorm(nn.Module):
+    def __init__(self, dim: int) -> None:
+        super().__init__()
+        self.norm = nn.LayerNorm(normalized_shape=dim)
+    def forward(self, x: torch.Tensor):
+        x = x.transpose(-1, -2)
+        x = self.norm(x)
+        x = x.transpose(-1, -2)
+        return x
+
 class FeedForward(nn.Module):
     def __init__(self, d_model: int, dropout_rate: float = 0.0) -> None:
         super().__init__()

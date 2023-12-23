@@ -1,40 +1,49 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from src.utils.ffn import LayerNorm
+from typing import Optional
 
 class DDSConv(nn.Module):
-    def __init__(self, n_layers: int, channels: int, kernel_size: int, dropout_rate: float) -> None:
+    def __init__(self, n_layers: int, channels: int, kernel_size: int, dropout_rate: float = 0.0) -> None:
         super().__init__()
-        self.convolutions = nn.ModuleList([DDSConvLayer(i, channels, kernel_size, dropout_rate) for i in range(n_layers)])
+        self.channels = channels
+        self.n_layers = n_layers
+        self.kernel_size = kernel_size
 
-    def forward(self, x: torch.Tensor):
-        for conv in self.convolutions:
-            x = conv(x)
+        self.layers = nn.ModuleList([DDSConvLayer(i, channels, kernel_size, dropout_rate) for i in range(n_layers)])
+    
+    def forward(self, x: torch.Tensor, g: Optional[torch.Tensor] = None):
+        for layer in self.layers:
+            x = layer(x, g)
         return x
 
 class DDSConvLayer(nn.Module):
-    def __init__(self, index: int, channels: int, kernel_size: int, dropout_rate: float) -> None:
+    def __init__(self, index: int, channels: int, kernel_size: int, dropout_rate: float = 0.0) -> None:
         super().__init__()
+        self.dropout_rate = dropout_rate
+
         dilation = kernel_size ** index
         padding = (kernel_size * dilation - dilation) // 2
-
-        self.sep_conv = nn.Conv1d(in_channels=channels, out_channels=channels, kernel_size=kernel_size, groups=channels, padding=padding)
-        self.norm_1 = nn.LayerNorm(normalized_shape=channels)
+        
+        self.depth_sep_conv = nn.Conv1d(in_channels=channels, out_channels=channels, kernel_size=kernel_size, padding=padding, dilation=dilation, groups=channels)
+        self.norm_1 = LayerNorm(dim=channels)
         self.conv_1x1 = nn.Conv1d(in_channels=channels, out_channels=channels, kernel_size=1)
-        self.norm_2 = nn.LayerNorm(normalized_shape=channels)
+        self.norm_2 = LayerNorm(dim=channels)
 
-        self.dropout = nn.Dropout(p=dropout_rate)
-    
-    def forward(self, x: torch.Tensor):
-        res = x
+    def forward(self, x: torch.Tensor, g: Optional[torch.Tensor] = None):
+        if g is not None:
+            x += g
 
-        x = self.sep_conv(x)
-        x = F.gelu(self.norm_1(x))
-        x = self.conv_1x1(x)
-        x = F.gelu(self.norm_2(x))
-        x = self.dropout(x)
+        y = self.depth_sep_conv(x)
+        y = F.gelu(self.norm_1(y))
+        y = self.conv_1x1(y)
+        y = F.gelu(self.norm_2(y))
 
-        return x + res
+        x += y
+
+        return x
+        
 
 class Invertible1x1Convolution(nn.Module):
     def __init__(self, channels: int) -> None:
