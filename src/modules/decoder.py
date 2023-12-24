@@ -2,18 +2,17 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from typing import Union
-from torch.nn.utils import weight_norm
 
 class Generator(torch.nn.Module):
     def __init__(self, n_mel_channels: int, upsample_rates: Union[list, tuple], upsample_kernel_sizes: Union[list, tuple], upsample_initial_channel: int, resblock_kernel_sizes: Union[list, tuple], resblock_dilation_sizes: Union[list, tuple]):
         super().__init__()
         self.num_kernels = len(resblock_kernel_sizes)
         self.num_upsamples = len(upsample_rates)
-        self.conv_pre = weight_norm(nn.Conv1d(n_mel_channels, upsample_initial_channel, 7, 1, padding=3))
+        self.conv_pre = nn.utils.parametrizations.weight_norm(nn.Conv1d(n_mel_channels, upsample_initial_channel, 7, 1, padding=3))
 
         self.ups = nn.ModuleList()
         for i, (u, k) in enumerate(zip(upsample_rates, upsample_kernel_sizes)):
-            self.ups.append(weight_norm(
+            self.ups.append(nn.utils.parametrizations.weight_norm(
                 nn.ConvTranspose1d(upsample_initial_channel//(2**i), upsample_initial_channel//(2**(i+1)),
                                 k, u, padding=(k-u)//2)))
 
@@ -23,7 +22,7 @@ class Generator(torch.nn.Module):
             for _, (k, d) in enumerate(zip(resblock_kernel_sizes, resblock_dilation_sizes)):
                 self.resblocks.append(ResBlock(ch, k, d))
 
-        self.conv_post = weight_norm(nn.Conv1d(ch, 1, 7, 1, padding=3))
+        self.conv_post = nn.utils.parametrizations.weight_norm(nn.Conv1d(ch, 1, 7, 1, padding=3))
         self.ups.apply(init_weights)
         self.conv_post.apply(init_weights)
 
@@ -57,21 +56,21 @@ class ResBlock(torch.nn.Module):
     def __init__(self, channels, kernel_size=3, dilation=(1, 3, 5)):
         super(ResBlock, self).__init__()
         self.convs1 = nn.ModuleList([
-            weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=dilation[0],
+            nn.utils.parametrizations.weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=dilation[0],
                                padding=get_padding(kernel_size, dilation[0]))),
-            weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=dilation[1],
+            nn.utils.parametrizations.weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=dilation[1],
                                padding=get_padding(kernel_size, dilation[1]))),
-            weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=dilation[2],
+            nn.utils.parametrizations.weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=dilation[2],
                                padding=get_padding(kernel_size, dilation[2])))
         ])
         self.convs1.apply(init_weights)
 
         self.convs2 = nn.ModuleList([
-            weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=1,
+            nn.utils.parametrizations.weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=1,
                                padding=get_padding(kernel_size, 1))),
-            weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=1,
+            nn.utils.parametrizations.weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=1,
                                padding=get_padding(kernel_size, 1))),
-            weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=1,
+            nn.utils.parametrizations.weight_norm(nn.Conv1d(channels, channels, kernel_size, 1, dilation=1,
                                padding=get_padding(kernel_size, 1)))
         ])
         self.convs2.apply(init_weights)

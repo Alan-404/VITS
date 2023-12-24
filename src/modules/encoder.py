@@ -5,6 +5,33 @@ from src.utils.transformer import TranformerEncoder
 from src.utils.net import WN
 from typing import Optional
 
+class PriorEncoder(nn.Module):
+    def __init__(self, phoneme_size: int, n: int, d_model: int, heads: int, eps: float, dropout_rate: float) -> None:
+        super().__init__()
+        self.d_model = d_model
+
+        self.text_encoder = TextEncoder(
+            phoneme_size=phoneme_size,
+            n=n,
+            d_model=d_model,
+            heads=heads,
+            eps=eps,
+            dropout_rate=dropout_rate
+        )
+
+        self.projection = nn.Linear(in_features=d_model, out_features=2*d_model)
+
+    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None):
+        x = self.text_encoder(x, mask)
+
+        stats = self.projection(x)
+
+        x = x.transpose(-1, -2)
+
+        mean, logs = torch.split(stats.transpose(-1, -2), self.d_model, dim=1)
+
+        return x, mean, logs
+
 class PosteriorEncoder(nn.Module):
     def __init__(self, n_layers: int, in_channels: int, out_channels: int, hidden_channels: int, kernel_size: int, dilation_rate: int = 2, gin_channels: Optional[int] = None) -> None:
         super().__init__()
@@ -24,18 +51,6 @@ class PosteriorEncoder(nn.Module):
         z = m + torch.rand_like(m) * torch.exp(logs)
 
         return z, m, logs
-
-class PriorEncoder(nn.Module):
-    def __init__(self, phoneme_size: int, n: int, d_model: int, heads: int, eps: float, dropout_rate: float) -> None:
-        super().__init__()
-        self.d_model = d_model
-        self.text_encoder = TextEncoder(phoneme_size=phoneme_size, n=n, d_model=d_model, heads=heads, eps=eps, dropout_rate=dropout_rate)
-        self.projection = nn.Linear(in_features=d_model, out_features=2*d_model)
-
-    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None):
-        hidden_text = self.text_encoder(x, mask)
-        mean, sigma = torch.split(self.projection(hidden_text), self.d_model, dim=-1)
-        return hidden_text, mean, sigma
 
 class TextEncoder(nn.Module):
     def __init__(self, phoneme_size: int, n: int, d_model: int, heads: int, eps: float, dropout_rate: float) -> None:

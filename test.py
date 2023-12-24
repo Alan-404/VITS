@@ -1,14 +1,35 @@
 #%%
+from src.utils.affine_coupling import ResidualCouplingBlock
+from src.vits import VITS
 import torch
 import torchsummary
-from src.modules.duration import DurationPredictor
-from src.modules.encoder import PosteriorEncoder
 # %%
-layer = PosteriorEncoder(n_layers=3, in_channels=80, out_channels=192, hidden_channels=128, kernel_size=3)
+model = VITS(
+    phoneme_size=99,
+    n=6,
+    d_model=192,
+    heads=2,
+    hidden_channels=128,
+    kernel_size=3,
+    n_mels=80,
+    n_layers=4,
+    upsample_rates=[8,8,2,2],
+    upsample_kernel_sizes=[16,16,4,4],
+    upsample_initial_channel=512,
+    resblock_kernel_sizes=[3,7,11],
+    resblock_dilation_sizes=[[1,3,5], [1,3,5], [1,3,5]],
+    eps=1e-5,
+    dropout_rate=0.1
+)
 # %%
-a = torch.rand((1, 80, 140))
+phonemes = torch.tensor([[1,4,7,8]])
+mel = torch.rand((1, 80, 140))
 # %%
-out = layer(a)
+out = model(phonemes, mel)
 # %%
 out
+# %%
+len(out)
+# %%
+out.shape
 # %%
