@@ -15,6 +15,7 @@ class VITS(nn.Module):
                  n_layers: int,
                  hidden_channels: int, 
                  kernel_size: int,
+                 dilation_rate: int,
                  upsample_rates: List[int],
                  upsample_kernel_sizes: List[int],
                  upsample_initial_channel: int,
@@ -46,7 +47,7 @@ class VITS(nn.Module):
             out_channels=d_model,
             hidden_channels=hidden_channels,
             kernel_size=kernel_size,
-            dilation_rate=2
+            dilation_rate=dilation_rate
         )
 
         self.decoder = Generator(
@@ -66,4 +67,3 @@ class VITS(nn.Module):
 
         signal = self.decoder(z)
         return signal
-

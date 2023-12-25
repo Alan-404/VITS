@@ -38,13 +38,4 @@ out, _ = layer(a)
 # %%
 out.shape
 # %%
-out
-# %%
-rev = layer(out, reverse=True)
-# %%
-rev
-# %%
-a
-# %%
-out
-# %%
+
