@@ -6,7 +6,7 @@ from src.utils.transform import piecewise_rational_quadratic_transform
 from typing import Optional
 
 class ConvFlow(nn.Module):
-  def __init__(self, in_channels: int, filter_channels: int, kernel_size: int, n_layers: int, num_bins: int=10, tail_bound: int=5.0):
+  def __init__(self, in_channels: int, filter_channels: int, kernel_size: int, n_layers: int, num_bins: int=10, tail_bound: float=5.0):
     super().__init__()
     self.in_channels = in_channels
     self.filter_channels = filter_channels
