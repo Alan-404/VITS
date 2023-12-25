@@ -22,14 +22,29 @@ model = VITS(
     dropout_rate=0.1
 )
 # %%
-phonemes = torch.tensor([[1,4,7,8]])
-mel = torch.rand((1, 80, 140))
+import torch
+from src.modules.flow import ConvFlow
 # %%
-out = model(phonemes, mel)
+layer = ConvFlow(
+    in_channels=192,
+    filter_channels=128,
+    kernel_size=3,
+    n_layers=4
+)
+# %%
+a = torch.rand((1, 192, 140))
+# %%
+out, _ = layer(a)
+# %%
+out.shape
 # %%
 out
 # %%
-len(out)
+rev = layer(out, reverse=True)
 # %%
-out.shape
+rev
+# %%
+a
+# %%
+out
 # %%

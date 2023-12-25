@@ -87,6 +87,18 @@ class Flip(nn.Module):
             return x, logdet
         else:
             return x
+        
+class Log(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+    def forward(self, x: torch.Tensor, reverse: bool = False):
+        if not reverse:
+            y = torch.log(torch.clamp(x, 1e-5))
+            logdet = torch.sum(-y, dim=[1,2])
+            return y, logdet
+        else:
+            x = torch.exp(x)
+            return x
 
 class ElementwiseAffine(nn.Module):
     def __init__(self, channels: int) -> None:

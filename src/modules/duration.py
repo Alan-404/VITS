@@ -4,6 +4,10 @@ import torch.nn.functional as F
 from src.utils.ffn import LayerNorm
 from typing import Optional
 
+class StochasticDurationPredictor(nn.Module):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
 class DurationPredictor(nn.Module):
     def __init__(self, in_channels: int, filter_channels: int, kernel_size: int, dropout_rate: float = 0.0, gin_channels: Optional[int] = None) -> None:
         super().__init__()

@@ -44,7 +44,6 @@ class DDSConvLayer(nn.Module):
 
         return x
         
-
 class Invertible1x1Convolution(nn.Module):
     def __init__(self, channels: int) -> None:
         super().__init__()
