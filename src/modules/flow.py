@@ -6,7 +6,7 @@ from src.utils.transform import piecewise_rational_quadratic_transform
 from typing import Optional
 
 class ConvFlow(nn.Module):
-  def __init__(self, in_channels, filter_channels, kernel_size, n_layers, num_bins=10, tail_bound=5.0):
+  def __init__(self, in_channels: int, filter_channels: int, kernel_size: int, n_layers: int, num_bins: int=10, tail_bound: float=5.0):
     super().__init__()
     self.in_channels = in_channels
     self.filter_channels = filter_channels
@@ -35,7 +35,8 @@ class ConvFlow(nn.Module):
     unnormalized_heights = h[..., self.num_bins:2*self.num_bins] / math.sqrt(self.filter_channels)
     unnormalized_derivatives = h[..., 2 * self.num_bins:]
 
-    x1, logabsdet = piecewise_rational_quadratic_transform(x1,
+    x1, logabsdet = piecewise_rational_quadratic_transform(
+        x1,
         unnormalized_widths,
         unnormalized_heights,
         unnormalized_derivatives,
