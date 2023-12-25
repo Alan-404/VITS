@@ -33,3 +33,26 @@ len(out)
 # %%
 out.shape
 # %%
+from src.modules.flow import ConvFlow
+# %%
+import torch
+# %%
+layer = ConvFlow(
+    in_channels=192,
+    filter_channels=128,
+    kernel_size=3,
+    n_layers=4,
+)
+# %%
+a = torch.rand((1, 192, 147))
+# %%
+out = layer(a)
+# %%
+out[0]
+# %%
+rev = layer(out[0], reverse=False)
+# %%
+rev
+# %%
+a
+# %%
