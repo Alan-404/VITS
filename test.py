@@ -1,5 +1,4 @@
 #%%
-from src.utils.affine_coupling import ResidualCouplingBlock
 from src.vits import VITS
 import torch
 import torchsummary
@@ -33,7 +32,7 @@ model = VITS(
 )
 #%%
 text = "hiện nay vị trí của bàn thờ thường được đặt trong phòng riêng ở tầng trên cùng của nhà"
-path = "D:\datasets/tts\infore_tech/audio/00000.wav"
+path = "C:\src\dataset\InfoRe_Technology/00000.wav"
 #%%
 tokens = processor.text2digit(text)
 # %%
@@ -86,11 +85,27 @@ neg_cent.shape
 # %%
 from src.utils.mas import monotonic_alignment_search
 # %%
-out = monotonic_alignment_search(neg_cent[0])
+out = monotonic_alignment_search(neg_cent[0].transpose(0,1))
 # %%
 out.shape
 # %%
-out.shape
+out[2].shape
 # %%
 out
+# %%
+out = torch.tensor(out).unsqueeze(0)
+# %%
+out.shape
+# %%
+w = torch.sum(out)
+# %%
+w = w.unsqueeze(0)
+# %%
+w.shape
+# %%
+
+# %%
+dur_out = model.dp(hidden, w=w)
+# %%
+x.size()
 # %%

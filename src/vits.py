@@ -4,7 +4,7 @@ from src.modules.encoder import PriorEncoder, PosteriorEncoder
 from src.modules.decoder import Generator
 from src.utils.affine_coupling import ResidualCouplingBlock
 from src.modules.duration import StochasticDurationPredictor, DurationPredictor
-from src.utils.mas import monotonic_alignment_search
+from src.utils.mas import monotonic_alignment_search_batch
 from typing import Optional
 from typing import List
 import math
@@ -86,11 +86,7 @@ class VITS(nn.Module):
             neg_cent4 = torch.sum(-0.5 * (x_mean ** 2) * s_p_sq_r, [1], keepdim=True) # [b, 1, t_s]
             neg_cent = neg_cent1 + neg_cent2 + neg_cent3 + neg_cent4
 
-            attn = []
-
-            for item in neg_cent:
-                attn.append(monotonic_alignment_search(item))
-            attn = torch.stack(np.array(attn))
+            attn = monotonic_alignment_search_batch(neg_cent)
         
         w = torch.sum(attn)
 
