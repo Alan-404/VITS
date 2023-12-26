@@ -38,19 +38,4 @@ out, _ = layer(a)
 # %%
 out.shape
 # %%
-out
-# %%
-rev = layer(out, reverse=True)
-# %%
-rev
-# %%
-a
-# %%
-out
-# %%
-import torch
-# %%
-a = torch.rand((1, 50, 140))
-# %%
-a.gather(dim=0)
-# %%
+
