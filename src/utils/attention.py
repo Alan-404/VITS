@@ -41,7 +41,7 @@ class MultiHeadAttention(nn.Module):
 
         # (Optional) Apply Mask
         if mask is not None:
-            attention_score += mask * (float('-inf'))
+            attention_score = attention_score.masked_fill(mask, float('-inf'))
 
         # Softmax
         attention_weights = F.softmax(attention_score, dim=-1)

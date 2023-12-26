@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from src.utils.convolution import DDSConv
 import math
-from src.utils.transform import piecewise_rational_quadratic_transform
+from utils.spline import piecewise_rational_quadratic_transform
 from typing import Optional
 
 class ConvFlow(nn.Module):
