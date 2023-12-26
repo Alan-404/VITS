@@ -5,7 +5,7 @@ def monotonic_alignment_search_batch(hidden: torch.Tensor):
     paths = []
     for item in hidden:
         paths.append(monotonic_alignment_search(item))
-    return torch.stack(paths)
+    return torch.stack(np.array(paths))
 
 def monotonic_alignment_search(value: torch.Tensor):
     value = value.transpose(0,1)
