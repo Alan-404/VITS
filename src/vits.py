@@ -29,10 +29,14 @@ class VITS(nn.Module):
                  eps: float, 
                  use_sdp: bool,
                  dropout_rate: float,
+                 num_speakers: Optional[int] = None,
                  gin_channels: Optional[int]=None) -> None:
         super().__init__()
         self.d_model = d_model
         self.use_sdp = use_sdp
+
+        if num_speakers is not None and num_speakers not in [0,1] and gin_channels is not None and gin_channels != 0:
+            self.speaker_embedding = nn.Embedding(num_embeddings=num_speakers, embedding_dim=gin_channels)
 
         self.prior_encoder = PriorEncoder(
             phoneme_size=phoneme_size,
@@ -62,6 +66,7 @@ class VITS(nn.Module):
             self.dp = StochasticDurationPredictor(channels=hidden_channels, kernel_size=3, dropout_rate=0.5, gin_channels=gin_channels)
         else:
             self.dp = DurationPredictor(in_channels=hidden_channels, filter_channels=hidden_channels, kernel_size=3, dropout_rate=0.5, gin_channels=gin_channels)
+
 
         self.decoder = Generator(
             n_mel_channels=d_model,
