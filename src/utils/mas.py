@@ -2,13 +2,13 @@ import numpy as np
 import torch
 
 def monotonic_alignment_search_batch(hidden: torch.Tensor):
+    hidden = hidden.transpose(1,2)
     paths = []
     for item in hidden:
         paths.append(monotonic_alignment_search(item))
-    return torch.stack(paths)
+    return torch.stack(paths).type(torch.FloatTensor)
 
 def monotonic_alignment_search(value: torch.Tensor):
-    value = value.transpose(0,1)
     t_x, t_y = value.shape # [text_length, letent_variable_length]
     path = np.zeros([t_x, t_y])
     # A cache to store the log-likelihood for the most likely alignment so far.

@@ -45,9 +45,15 @@ mel.shape
 x = tokens.unsqueeze(0)
 y = mel.unsqueeze(0)
 # %%
-out, w = model(x, y)
+out = model(x, y)
 # %%
-dur_out = model.dp(out, w)
+out
 # %%
-dur_out
+out[0]
+# %%
+out[1]
+# %%
+out[2].shape
+# %%
+out[2][0][50]
 # %%

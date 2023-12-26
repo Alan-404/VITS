@@ -93,18 +93,19 @@ class VITS(nn.Module):
             attn = monotonic_alignment_search_batch(neg_cent)
         
         w = torch.sum(attn, dim=2).unsqueeze(1).type(torch.FloatTensor)
-        return x, w
 
-        # if self.use_sdp:
-        #     l_length = self.dp(x, w, g=g)
-        # else:
-        #     logw_ = torch.log(w + 1e-6)
-        #     logw = self.dp(x, g=g)
-        #     l_length = torch.sum((logw - logw_)**2, [1,2])
+        if self.use_sdp:
+            l_length = self.dp(x, w, g=g)
+            print(l_length)
+        else:
+            logw_ = torch.log(w + 1e-6)
+            logw = self.dp(x, g=g)
+            l_length = torch.sum((logw - logw_)**2, [1,2])
 
-        # m_p = torch.matmul(attn.squeeze(1), m_p.transpose(1, 2)).transpose(1, 2)
-        # logs_p = torch.matmul(attn.squeeze(1), logs_p.transpose(1, 2)).transpose(1, 2)
+        attn = attn.transpose(-1, -2)
+        x_mean = torch.matmul(attn, x_mean.transpose(1, 2)).transpose(1, 2)
+        x_logs = torch.matmul(attn, x_logs.transpose(1, 2)).transpose(1, 2)
 
-        # signal = self.decoder(z)
+        signal = self.decoder(z)
 
-        # return signal, l_length, attn, (y, z, x_mean, x_logs, y_mean, y_logs)
+        return signal, l_length, attn, (y, z, x_mean, x_logs, y_mean, y_logs)
