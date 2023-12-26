@@ -117,7 +117,8 @@ class VITSProcessor:
     
     def text2digit(self, text: str):
         phonemes = self.text2phonemes(text)
-        digits = [self.bos_token] + self.dictionary(phonemes) + [self.eos_token]
+        # digits = [self.bos_token] + self.dictionary(phonemes) + [self.eos_token]
+        digits = self.dictionary(phonemes)
         return torch.tensor(digits)
     
     def text2phonemes(self, text: str):
