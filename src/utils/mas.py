@@ -30,4 +30,4 @@ def monotonic_alignment_search(value: torch.Tensor):
         path[index, y] = 1
         if index != 0 and (index == y or Q[index, y-1] < Q[index-1, y-1]):
             index = index - 1
-    return path
+    return torch.tensor(path)

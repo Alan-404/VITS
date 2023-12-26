@@ -107,12 +107,11 @@ class ElementwiseAffine(nn.Module):
         self.m = nn.Parameter(torch.zeros(channels, 1))
         self.logs = nn.Parameter(torch.zeros(channels, 1))
 
-    def forward(self, x: torch.Tensor, mask: torch.Tensor, reverse: bool = False):
+    def forward(self, x: torch.Tensor, reverse: bool = False):
         if reverse == False:
             y = self.m + torch.exp(self.logs) * x
-            y = y * mask
-            logdet = torch.sum(self.logs * mask, [1,2])
+            logdet = torch.sum(self.logs, dim=0)
             return y, logdet
         else:
-            x = (x - self.m) * torch.exp(-self.logs) * mask
+            x = (x - self.m) * torch.exp(-self.logs)
             return x

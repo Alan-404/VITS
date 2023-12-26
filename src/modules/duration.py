@@ -34,7 +34,7 @@ class StochasticDurationPredictor(nn.Module):
             self.post_flows.append(ConvFlow(in_channels=2, filter_channels=channels, kernel_size=kernel_size, n_layers=3))
             self.post_flows.append(Flip())
 
-        self.pre = nn.Conv1d(in_channels=1, out_channels=channels, kernel_size=1)
+        self.pre = nn.Conv1d(in_channels=channels, out_channels=channels, kernel_size=1)
         self.proj = nn.Conv1d(in_channels=channels, out_channels=channels, kernel_size=1)
         self.convs = DDSConv(n_layers=3, channels=channels, kernel_size=kernel_size, dropout_rate=dropout_rate)
 
@@ -65,7 +65,7 @@ class StochasticDurationPredictor(nn.Module):
             z_q = e_q
 
             for flow in self.post_flows:
-                z_q, logdet_q = flow(z_q, g=(x + h_w))
+                z_q, logdet_q = flow(z_q)
                 logdet_tot_q += logdet_q
             
             z_u, z1 = torch.split(z_q, [1,1], 1)
@@ -80,7 +80,7 @@ class StochasticDurationPredictor(nn.Module):
             z = torch.cat([z0, z1], 1)
 
             for flow in flows:
-                z, logdet = flow(z, g=x, reverse=reverse)
+                z, logdet = flow(z, reverse=reverse)
                 logdet_tot = logdet_tot + logdet
 
             nll = torch.sum(0.5 * (math.log(2*math.pi) + (z**2)), [1,2]) - logdet_tot
