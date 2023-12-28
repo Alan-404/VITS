@@ -28,10 +28,14 @@ class VITS(nn.Module):
                  eps: float, 
                  use_sdp: bool,
                  dropout_rate: float,
+                 num_speakers: Optional[int] = None,
                  gin_channels: Optional[int]=None) -> None:
         super().__init__()
         self.d_model = d_model
         self.use_sdp = use_sdp
+
+        if num_speakers is not None and num_speakers not in [0,1] and gin_channels is not None and gin_channels != 0:
+            self.speaker_embedding = nn.Embedding(num_embeddings=num_speakers, embedding_dim=gin_channels)
 
         self.prior_encoder = PriorEncoder(
             phoneme_size=phoneme_size,
@@ -58,9 +62,9 @@ class VITS(nn.Module):
         )
 
         if use_sdp:
-            self.dp = StochasticDurationPredictor(channels=hidden_channels, kernel_size=3, dropout_rate=0.5, gin_channels=gin_channels)
+            self.dp = StochasticDurationPredictor(channels=d_model, kernel_size=3, dropout_rate=0.5, gin_channels=gin_channels)
         else:
-            self.dp = DurationPredictor(in_channels=hidden_channels, filter_channels=hidden_channels, kernel_size=3, dropout_rate=0.5, gin_channels=gin_channels)
+            self.dp = DurationPredictor(in_channels=d_model, filter_channels=hidden_channels, kernel_size=3, dropout_rate=0.5, gin_channels=gin_channels)
 
         self.decoder = Generator(
             n_mel_channels=d_model,
@@ -87,17 +91,20 @@ class VITS(nn.Module):
 
             attn = monotonic_alignment_search_batch(neg_cent)
         
-        w = torch.sum(attn)
+        w = torch.sum(attn, dim=2).unsqueeze(1).type(torch.FloatTensor)
 
         if self.use_sdp:
             l_length = self.dp(x, w, g=g)
+            print(l_length)
         else:
             logw_ = torch.log(w + 1e-6)
             logw = self.dp(x, g=g)
             l_length = torch.sum((logw - logw_)**2, [1,2])
 
-        m_p = torch.matmul(attn.squeeze(1), m_p.transpose(1, 2)).transpose(1, 2)
-        logs_p = torch.matmul(attn.squeeze(1), logs_p.transpose(1, 2)).transpose(1, 2)
+        attn = attn.transpose(-1, -2)
+        x_mean = torch.matmul(attn, x_mean.transpose(1, 2)).transpose(1, 2)
+        x_logs = torch.matmul(attn, x_logs.transpose(1, 2)).transpose(1, 2)
 
         signal = self.decoder(z)
-        return signal, l_length
+
+        return signal, l_length, attn, (y, z, x_mean, x_logs, y_mean, y_logs)
