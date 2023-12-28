@@ -1,15 +1,12 @@
 #%%
 from src.vits import VITS
 import torch
-import torchsummary
-import math
 from preprocessing.processor import VITSProcessor
+from src.utils.masking import generate_mask
 #%%
 processor = VITSProcessor(
     phoneme_path='./phonemes/phoneme.json'
 )
-# %%
-
 # %%
 model = VITS(
     phoneme_size=len(processor.dictionary),
@@ -31,29 +28,26 @@ model = VITS(
     dropout_rate=0.1
 )
 #%%
-text = "hiện nay vị trí của bàn thờ thường được đặt trong phòng riêng ở tầng trên cùng của nhà"
-path = "D:\datasets/tts\infore_tech/audio/00000.wav"
+text = [
+    "hiện nay vị trí của bàn thờ thường được đặt trong phòng riêng ở tầng trên cùng của nhà",
+    "để cậu nhỏ hướng lên hay hướng xuống khi mặc quần lót"
+]
+paths = [
+    "D:\datasets/tts\infore_tech/audio/00000.wav",
+    "D:\datasets/tts\infore_tech/audio/00001.wav"
+]
 #%%
-tokens = processor.text2digit(text)
-# %%
-tokens
+tokens, lengths = processor(text)
 #%%
-mel = processor.log_mel_spectrogram(processor.load_audio(path))
+signals = []
+for path in paths:
+    signals.append(processor.load_audio(path))
+#%%
+mels, mel_lengths = processor.mel_spectrogize(signals)
 # %%
-mel.shape
-# %%
-x = tokens.unsqueeze(0)
-y = mel.unsqueeze(0)
-# %%
-out = model(x, y)
-# %%
-out
+out = model(
+    tokens, mels, lengths, mel_lengths
+)
 # %%
 out[0]
-# %%
-out[1]
-# %%
-out[2].shape
-# %%
-out[2][0][50]
 # %%

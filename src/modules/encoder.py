@@ -22,14 +22,10 @@ class PriorEncoder(nn.Module):
         self.projection = nn.Linear(in_features=d_model, out_features=2*d_model)
 
     def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None):
-        x = self.text_encoder(x, mask)
-
-        stats = self.projection(x)
-
+        x = self.text_encoder(x, mask.unsqueeze(1).unsqueeze(1))
+        stats = self.projection(x).masked_fill(mask.unsqueeze(2), 0)
         x = x.transpose(-1, -2)
-
         mean, logs = torch.split(stats.transpose(-1, -2), self.d_model, dim=1)
-
         return x, mean, logs
 
 class PosteriorEncoder(nn.Module):
@@ -41,10 +37,11 @@ class PosteriorEncoder(nn.Module):
         self.encoder = WN(hidden_channels=hidden_channels, kernel_size=kernel_size, n_layers=n_layers, dilation_rate=dilation_rate, gin_channels=gin_channels)
         self.proj = nn.Conv1d(in_channels=hidden_channels, out_channels=2*out_channels, kernel_size=1)
 
-    def forward(self, x: torch.Tensor, g: Optional[torch.Tensor] = None):
-        x = self.pre(x)
-        x = self.encoder(x, g)
-        stats = self.proj(x)
+    def forward(self, x: torch.Tensor, mask: torch.Tensor, g: Optional[torch.Tensor] = None):
+        mask = mask.unsqueeze(1)
+        x = self.pre(x).masked_fill(mask, 0)
+        x = self.encoder(x, g).masked_fill(mask, 0)
+        stats = self.proj(x).masked_fill(mask, 0)
 
         m, logs = torch.split(stats, self.out_channels, dim=1)
 

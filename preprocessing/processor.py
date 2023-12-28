@@ -176,7 +176,7 @@ class VITSProcessor:
 
         return phonemes
     
-    def __call__(self, sentences: list, max_len: Optional[int] = None, return_attention_mask: bool = False) -> Any:
+    def __call__(self, sentences: list, max_len: Optional[int] = None) -> Any:
         digits = []
         lengths = []
 
@@ -191,12 +191,8 @@ class VITSProcessor:
         tokens = []
         for index, digit in enumerate(digits):
             tokens.append(F.pad(digit, (0, max_len - lengths[index]), mode='constant', value=self.padding_token))
-
-        if return_attention_mask:
-            mask = self.generate_mask(lengths)
-            return torch.stack(tokens), torch.tensor(lengths), mask
         
-        return torch.stack(tokens)
+        return torch.stack(tokens), torch.tensor(lengths)
     
     def mel_spectrogize(self, signals: list, max_len: Optional[int] = None, return_attention_mask: bool = False):
         if max_len is None:
@@ -213,9 +209,4 @@ class VITSProcessor:
             mels.append(log_mel)
             mel_lengths.append((signal_length // self.hop_length) + 1)
 
-        if return_attention_mask:
-            mask = self.generate_mask(mel_lengths)
-
-            return torch.stack(mels), mask
-
-        return torch.stack(mels)
+        return torch.stack(mels), torch.tensor(mel_lengths)
