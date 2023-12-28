@@ -37,17 +37,3 @@ paths = [
     "D:\datasets/tts\infore_tech/audio/00001.wav"
 ]
 #%%
-tokens, lengths = processor(text)
-#%%
-signals = []
-for path in paths:
-    signals.append(processor.load_audio(path))
-#%%
-mels, mel_lengths = processor.mel_spectrogize(signals)
-# %%
-out = model(
-    tokens, mels, lengths, mel_lengths
-)
-# %%
-out[0]
-# %%

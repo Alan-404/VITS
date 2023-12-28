@@ -9,9 +9,10 @@ from src.utils.convolution import ConvFlow
 from src.utils.convolution import DDSConv
 
 class StochasticDurationPredictor(nn.Module):
-    def __init__(self, channels: int, kernel_size: int, dropout_rate: float, n_flows: int = 4, gin_channels: Optional[int] = None) -> None:
+    def __init__(self, channels: int, filter_channels: int, kernel_size: int, dropout_rate: float, n_flows: int = 4, gin_channels: Optional[int] = None) -> None:
         super().__init__()
         self.channels = channels
+        self.filter_channels = filter_channels
         self.kernel_size = kernel_size
         self.dropout_rate = dropout_rate
         self.n_flows = n_flows

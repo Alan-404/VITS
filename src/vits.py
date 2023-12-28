@@ -63,7 +63,7 @@ class VITS(nn.Module):
         )
 
         if use_sdp:
-            self.dp = StochasticDurationPredictor(channels=d_model, kernel_size=3, dropout_rate=0.5, gin_channels=gin_channels)
+            self.dp = StochasticDurationPredictor(channels=d_model, filter_channels=hidden_channels, kernel_size=3, dropout_rate=0.5, gin_channels=gin_channels)
         else:
             self.dp = DurationPredictor(in_channels=d_model, filter_channels=hidden_channels, kernel_size=3, dropout_rate=0.5, gin_channels=gin_channels)
 
