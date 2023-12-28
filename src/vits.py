@@ -8,7 +8,6 @@ from src.utils.mas import monotonic_alignment_search_batch
 from typing import Optional
 from typing import List
 import math
-import numpy as np
 
 class VITS(nn.Module):
     def __init__(self, 
