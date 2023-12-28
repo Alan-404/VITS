@@ -17,6 +17,7 @@ class MultiHeadAttention(nn.Module):
         self.linear_q = nn.Linear(in_features=d_model, out_features=d_model)
         self.linear_k = nn.Linear(in_features=d_model, out_features=d_model)
         self.linear_v = nn.Linear(in_features=d_model, out_features=d_model)
+        self.linear_pos = nn.Linear(in_features=d_model, out_features=d_model)
 
         self.content_bias = nn.Parameter(torch.Tensor(self.heads, self.head_samples))
         self.position_bias = nn.Parameter(torch.Tensor(self.heads, self.head_samples))
@@ -59,7 +60,7 @@ class MultiHeadAttention(nn.Module):
         q = self.linear_q(q).view(batch_size, -1, self.heads, self.head_samples)
         k = self.linear_k(k).view(batch_size, -1, self.heads, self.head_samples).permute(0, 2, 1, 3)
         v = self.linear_v(v).view(batch_size, -1, self.heads, self.head_samples).permute(0, 2, 1, 3)
-        pos_embedding = pos_embedding.view(batch_size, -1, self.heads, self.head_samples).permute(0, 2, 3, 1)
+        pos_embedding = self.linear_pos(pos_embedding).view(batch_size, -1, self.heads, self.head_samples).permute(0, 2, 3, 1)
 
         # Scaled - dot Attention with Relative Position
         attention_context = self.scaled_dot_product_relative_attention(q, k, v, pos_embedding, mask)

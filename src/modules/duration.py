@@ -5,7 +5,7 @@ from src.utils.ffn import LayerNorm
 from typing import Optional
 import math
 from src.utils.affine_coupling import Log, ElementwiseAffine, Flip
-from src.modules.flow import ConvFlow
+from src.utils.convolution import ConvFlow
 from src.utils.convolution import DDSConv
 
 class StochasticDurationPredictor(nn.Module):
@@ -56,7 +56,7 @@ class StochasticDurationPredictor(nn.Module):
             flows = self.flows
             assert w is not None
 
-            logdet_tot_q = 0
+            logdet_tot_q = torch.zeros((x.size(0)))
             h_w = self.post_pre(w)
             h_w = self.post_convs(h_w)
             h_w = self.post_proj(h_w)

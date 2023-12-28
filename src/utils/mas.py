@@ -1,11 +1,22 @@
 import numpy as np
 import torch
 
-def monotonic_alignment_search_batch(hidden: torch.Tensor):
+def monotonic_alignment_search_batch(hidden: torch.Tensor, x_lengths: torch.Tensor, y_lengths: torch.Tensor):
     hidden = hidden.transpose(1,2)
     paths = []
-    for item in hidden:
-        paths.append(monotonic_alignment_search(item))
+    for idx, item in enumerate(hidden):
+        x_len = x_lengths[idx]
+        y_len = y_lengths[idx]
+
+        x_num_pad = item.shape[0] - x_len
+        y_num_pad = item.shape[1] - y_len
+
+        path = monotonic_alignment_search(item[:x_lengths[idx], :y_lengths[idx]])
+        path = torch.concat([path, torch.zeros(x_num_pad, path.shape[1])], dim=0)
+        path = torch.concat([path, torch.zeros(path.shape[0], y_num_pad)], dim=1)
+
+        paths.append(path)
+        
     return torch.stack(paths).type(torch.FloatTensor)
 
 def monotonic_alignment_search(value: torch.Tensor):
