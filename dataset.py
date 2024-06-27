@@ -89,10 +89,7 @@ class VITSCollate:
         if self.training:
             phonemes, signals = zip(*batch)
             tokens, token_lengths = self.processor(phonemes)
-            signals, signal_lengths = self.processor.setup_audio(signals)
-
-            mels = self.processor.mel_spectrogram(signals)
-            mel_lengths = signal_lengths // self.processor.hop_length
+            mels, mel_lengths, signals = self.processor.as_target(signals)
 
             return tokens, mels, token_lengths, mel_lengths, signals
         else:

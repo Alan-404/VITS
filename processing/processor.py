@@ -270,6 +270,26 @@ class VITSProcessor:
             padded_tokens.append(F.pad(token_list, (0, max_length - lengths[index]), mode='constant', value=self.pad_id))
         return torch.stack(padded_tokens), torch.tensor(lengths)
     
+    def as_target(self, signals: List[torch.Tensor]):
+        lengths = []
+        max_length = 0
+        
+        for signal in signals:
+            length = len(signal)
+            lengths.append(length)
+            if max_length < length:
+                max_length = length
+        
+        padded_signals = []
+        for index, signal in enumerate(signals):
+            padded_signals.append(F.pad(signal, (0, max_length - lengths[index]), mode='constant', value=0.0))
+
+        padded_signals = torch.stack(padded_signals)
+        mels = self.mel_spectrogram(padded_signals)
+        lengths = torch.tensor(lengths) // self.hop_length
+
+        return mels, lengths, padded_signals
+    
     def get_audio_signal(self, paths: List[str]):
         signals = []
         for path in paths:
