@@ -76,7 +76,6 @@ class VITSModule(nn.Module):
             x=x,
             z=z,
             x_lengths=x_lengths,
-            z_lenghts=mel_lengths,
             z_mask=z_mask,
             g=g
         )

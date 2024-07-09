@@ -78,10 +78,17 @@ class VITS(nn.Module):
             if n_speakers is not None and n_speakers > 1:
                 self.speaker_embedding = nn.Embedding(num_embeddings=n_speakers, embedding_dim=gin_channels)
 
-    def forward(self, x: torch.Tensor, z: torch.Tensor, x_lengths: Optional[torch.Tensor] = None, z_lengths: Optional[torch.Tensor] = None, z_mask: Optional[torch.Tensor] = None, g: Optional[torch.Tensor] = None):
+    def forward(self, x: torch.Tensor, z: torch.Tensor, x_lengths: Optional[torch.Tensor] = None, z_mask: Optional[torch.Tensor] = None, g: Optional[torch.Tensor] = None):
+        batch_size = x.size(0)
+        
         x_mask = None
         if x_lengths is not None:
             x_mask = generate_mask(x_lengths).unsqueeze(dim=1)
+
+        if z_mask is not None:
+            z_lengths = z_mask.sum(dim=1)
+        else:
+            z_lengths = torch.ones((batch_size), device=x.device, dtype=x.dtype) * z.size(1)
 
         h_text = self.text_encoder(x, x_mask if x_mask is not None else None)
         text_stats = self.projection(h_text)
@@ -100,7 +107,7 @@ class VITS(nn.Module):
             neg_cent_4 = torch.sum(-0.5 * (m_p**2) * s_pq, dim=1, keepdim=True) # (batch_size, 1, text_length)
 
             neg_cent = neg_cent_1 + neg_cent_2 + neg_cent_3 + neg_cent_4
-            attn = find_path(neg_cent, text_lengths=x_lengths, mel_lengths=z_lengths).unsqueeze(1).detach()
+            attn = find_path(neg_cent, text_lengths=x_lengths, mel_lengths=z_mask.sum(dim=1)).unsqueeze(1).detach()
 
         l_length = self.duration_predictor(h_text, w=attn.sum(dim=2), mask=x_mask, g=g)
         if x_mask is not None:
