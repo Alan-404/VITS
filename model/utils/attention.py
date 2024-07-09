@@ -12,7 +12,6 @@ class MultiHeadAttention(nn.Module):
         self.k_channels = channels // n_heads
         self.window_size = window_size
         self.dropout_p = dropout_p
-        self.mask_value = 1e-4
 
         self.sqrt_dim = math.sqrt(self.k_channels)
 
@@ -26,11 +25,13 @@ class MultiHeadAttention(nn.Module):
             self.emb_rel_k = nn.Parameter(torch.randn(n_heads, window_size*2 + 1, self.k_channels) * rel_stddev)
             self.emb_rel_v = nn.Parameter(torch.randn(n_heads, window_size*2 + 1, self.k_channels) * rel_stddev)
 
+        self.mask_value = None
+
         nn.init.xavier_uniform_(self.conv_q.weight)
         nn.init.xavier_uniform_(self.conv_k.weight)
         nn.init.xavier_uniform_(self.conv_v.weight)
     
-    def forward(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask: Optional[torch.Tensor] = None):
+    def forward(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
         q = self.conv_q(q)
         k = self.conv_k(k)
         v = self.conv_v(v)
@@ -39,7 +40,7 @@ class MultiHeadAttention(nn.Module):
         attention = self.conv_o(attention)
         return attention
 
-    def attention(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask: Optional[torch.Tensor] = None):
+    def attention(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
         batch_size, dim, t_s = k.size()
         t_t = q.size(2)
 
@@ -55,6 +56,8 @@ class MultiHeadAttention(nn.Module):
             score_local = self._relative_position_to_absolute_position(rel_logits)
             scores = scores + score_local
         if mask is not None:
+            if self.mask_value is None:
+                self.mask_value = torch.iinfo(q.dtype).min
             scores.masked_fill_(~mask, self.mask_value)
         attention_weights = F.softmax(scores, dim=-1)
         attention_weights = F.dropout(attention_weights, p=self.dropout_p, training=self.training)
@@ -66,7 +69,7 @@ class MultiHeadAttention(nn.Module):
         attention_context = attention_context.transpose(2, 3).reshape((batch_size, dim, t_t))
         return attention_context
     
-    def _get_relative_embeddings(self, relative_embeddings: torch.Tensor, length: int):
+    def _get_relative_embeddings(self, relative_embeddings: torch.Tensor, length: int) -> torch.Tensor:
         pad_length = max(length - (self.window_size + 1), 0)
         slice_start_pos = max((self.window_size + 1) - length, 0)
         slice_end_pos = slice_start_pos + 2 * length - 1
@@ -79,7 +82,7 @@ class MultiHeadAttention(nn.Module):
             padded_relative_embedding = relative_embeddings
         return padded_relative_embedding[:, slice_start_pos : slice_end_pos]
     
-    def _absolute_position_to_relative_position(self, x: torch.Tensor):
+    def _absolute_position_to_relative_position(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, n_heads, length, _ = x.size()
         x = F.pad(x, convert_pad_shape([[0, 0], [0,0], [0,0], [0, length-1]]))
         x_flat = x.reshape((batch_size, n_heads, length ** 2 + length*(length - 1)))
@@ -87,8 +90,7 @@ class MultiHeadAttention(nn.Module):
         x_final = x_flat.reshape((batch_size, n_heads, length, 2*length))[:, :, :, 1:]
         return x_final
 
-
-    def _relative_position_to_absolute_position(self, x: torch.Tensor):
+    def _relative_position_to_absolute_position(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, n_heads, length, _ = x.size()
 
         x = F.pad(x, convert_pad_shape([[0,0], [0,0], [0,0], [0,1]]))

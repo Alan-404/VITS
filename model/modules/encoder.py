@@ -37,7 +37,7 @@ class PosteriorEncoder(nn.Module):
         self.pre_conv = nn.Conv1d(in_channels=n_mel_channels, out_channels=hidden_channels, kernel_size=1)
         self.wn = WN(channels=hidden_channels, n_layers=n_layers, dilation_rate=dilation_rate, kernel_size=kernel_size, dropout_p=dropout_p, gin_channels=gin_channels)
         self.proj = nn.Conv1d(in_channels=hidden_channels, out_channels=out_channels * 2, kernel_size=1)
-    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None, g: Optional[torch.Tensor] = None):
+    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None, g: Optional[torch.Tensor] = None) -> torch.Tensor:
         batch_size, _, length = x.size()
         x = self.pre_conv(x)
         if mask is not None:
@@ -47,7 +47,7 @@ class PosteriorEncoder(nn.Module):
             x = x * mask
         stats = self.proj(x)
         m, logs = torch.split(stats, [self.out_channels] * 2, dim=1)
-        z = m + torch.randn((batch_size, self.out_channels, length), dtype=x.dtype, device=x.device) * torch.exp(logs)
+        z = m + torch.randn((batch_size, self.out_channels, length), dtype=x.dtype, device=x.device) * torch.exp(logs) # Reparameterization Trick
         return z, m, logs
     
 class ConditionEncoder(nn.Module):

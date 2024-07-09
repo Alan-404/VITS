@@ -1,27 +1,57 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from librosa.filters import mel as librosa_mel_fn
+
 import math
 
-from typing import Optional, Callable, Union
+from typing import Optional
 
 class LinearSpectrogram(nn.Module):
     def __init__(self,
-                 n_fft: int,
+                 sample_rate: int = 22050,
+                 n_fft: int = 1024,
+                 hop_length: int = 256,
                  win_length: Optional[int] = None,
-                 hop_length: Optional[int] = None,
-                 window_fn: Callable[..., torch.Tensor] = torch.hann_window,
-                 pad: int = 0,
-                 center: bool = False,
-                 normalized: Union[bool, str] = False,
-                 pad_mode: str = 'reflect',
-                 onesided: bool = True) -> None:
+                 n_mel_channels: int = 80,
+                 fmin: float = 0.0,
+                 fmax: float = 8000.0) -> None:
         super().__init__()
+
+        self.sample_rate = sample_rate
+        self.n_fft = n_fft
+        self.hop_length = hop_length
+        self.win_length = win_length if win_length is not None else n_fft
+
         self.num_pad = (n_fft - hop_length) // 2
 
-    def forward(self, x: torch.Tensor):
+        self.mel_scale = MelScale(
+            n_stft=n_fft//2 + 1,
+            n_mels=n_mel_channels,
+            sample_rate=sample_rate,
+            f_min=fmin,
+            f_max=fmax,
+            norm='slaney'
+        )
+
+        self.register_buffer("window", torch.hann_window(self.win_length))
+
+    def forward(self, x: torch.Tensor, lengths: Optional[torch.Tensor] = None) -> torch.Tensor:
         x = F.pad(x, (self.num_pad, self.num_pad), mode='reflect')
+
+        x = torch.stft(
+            input=x,
+            n_fft=self.n_fft,
+            hop_length=self.hop_length,
+            win_length=self.win_length,
+            window=self.window,
+            center=False,
+            pad_mode='reflect',
+            normalized=False,
+            onesided=True,
+            return_complex=True
+        )
+
+        return x
 
 class MelScale(nn.Module):
     def __init__(self,
@@ -35,6 +65,7 @@ class MelScale(nn.Module):
         super().__init__()
         assert mel_scale in ['htk', 'slaney']
 
+        self.sample_rate = sample_rate
         self.f_min = f_min
         self.f_max = f_max if f_max is not None else sample_rate // 2
 
