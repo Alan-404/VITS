@@ -49,7 +49,6 @@ class VITS(nn.Module):
 
         self.projection = nn.Conv1d(in_channels=hidden_channels, out_channels=2*hidden_channels, kernel_size=1)
 
-        
         self.flow = Flow(
             n_flows=4, in_channels=hidden_channels, hidden_channels=hidden_channels, kernel_size=5, dilation_rate=1, n_layers=4, gin_channels=gin_channels
         )
