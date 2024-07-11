@@ -9,12 +9,13 @@ from typing import Optional
 class LinearSpectrogram(nn.Module):
     def __init__(self,
                  sample_rate: int = 22050,
-                 n_fft: int = 1024,
+                 n_fft: int = 2048,
                  hop_length: int = 256,
                  win_length: Optional[int] = None,
                  n_mel_channels: int = 80,
                  fmin: float = 0.0,
-                 fmax: float = 8000.0) -> None:
+                 fmax: float = 8000.0,
+                 power: Optional[float] = 2.0) -> None:
         super().__init__()
 
         self.sample_rate = sample_rate
@@ -24,18 +25,21 @@ class LinearSpectrogram(nn.Module):
 
         self.num_pad = (n_fft - hop_length) // 2
 
+        self.power = power
+
         self.mel_scale = MelScale(
             n_stft=n_fft//2 + 1,
             n_mels=n_mel_channels,
             sample_rate=sample_rate,
             f_min=fmin,
             f_max=fmax,
-            norm='slaney'
+            norm='slaney',
+            mel_scale='slaney'
         )
 
         self.register_buffer("window", torch.hann_window(self.win_length))
 
-    def forward(self, x: torch.Tensor, lengths: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = F.pad(x, (self.num_pad, self.num_pad), mode='reflect')
 
         x = torch.stft(
@@ -50,6 +54,12 @@ class LinearSpectrogram(nn.Module):
             onesided=True,
             return_complex=True
         )
+
+        if self.power is not None:
+            x = x.abs().pow(self.power)
+
+        x = self.mel_scale(x)
+        x = torch.log(x.clamp(min=1e-5))
 
         return x
 

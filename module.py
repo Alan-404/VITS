@@ -6,7 +6,7 @@ from typing import Optional, List
 from model.vits import VITS
 from model.modules.encoder import PosteriorEncoder
 from model.utils.masking import generate_mask
-
+from model.modules.mas.search import find_path
 from processing.processor import VITSProcessor
 
 class VITSModule(nn.Module):

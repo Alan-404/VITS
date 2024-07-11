@@ -112,13 +112,17 @@ class VITSProcessor:
     def mel_spectrogram(self, signal: torch.Tensor) -> torch.Tensor:
         if signal.device != self.device:
             signal = signal.to(self.device)
+        print(signal.shape)
         signal = F.pad(signal.unsqueeze(1), (int((self.n_fft-self.hop_length)/2), int((self.n_fft-self.hop_length)/2)), mode='reflect')
+        print(signal.shape)
         signal = signal.squeeze(1)
-
-        spec = torch.view_as_real(torch.stft(signal, n_fft=self.n_fft, hop_length=self.hop_length, win_length=self.win_length, window=self.hann_window,
-                      center=False, pad_mode='reflect', normalized=False, onesided=True, return_complex=True))
+        print(signal.shape)
+        spec = torch.stft(signal, n_fft=self.n_fft, hop_length=self.hop_length, win_length=self.win_length, window=self.hann_window,
+                      center=False, pad_mode='reflect', normalized=False, onesided=True, return_complex=True)
+        print(spec.shape)
         spec = torch.sqrt(spec.pow(2).sum(-1) + 1e-6)
-
+        print(spec.shape)
+        print(self.mel_basis.shape)
         spec = torch.matmul(self.mel_basis, spec)
         spec = self.spectral_normalize(spec)
 
