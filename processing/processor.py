@@ -23,6 +23,7 @@ class VITSProcessor:
         self.yolo = patterns
         self.replace_dict = patterns['replace']
         self.mapping = patterns['mapping']
+        self.single_vowels = patterns['single_vowel']
         vocab = []
 
         for key in patterns.keys():
@@ -208,15 +209,14 @@ class VITSProcessor:
         return graphemes
     
     def sentence2phonemes(self, sentence: str):
-        sentence = self.spec_replace(self.clean_text(sentence.upper()))
-        sentence = self.clean_text(sentence)
+        sentence = self.clean_text(sentence.upper())
         words = sentence.split(" ")
         graphemes = []
 
         length = len(words)
 
         for index, word in enumerate(words):
-            graphemes += self.slide_graphemes(word, self.pattern, n_grams=4)
+            graphemes += self.slide_graphemes(self.spec_replace(word), self.pattern, n_grams=4)
             if index != length - 1:
                 graphemes.append(self.delim_token)
 
@@ -237,9 +237,14 @@ class VITSProcessor:
         
         return words
     
-    def spec_replace(self, word: str):
+    def spec_replace(self, word: str) -> str:
         for key in self.replace_dict:
-            word = word.replace(key, self.replace_dict[key])
+            arr = word.split(key)
+            if len(arr) == 2:
+                if arr[1] in self.single_vowels:
+                    return word
+                else:
+                    return word.replace(key, self.replace_dict[key])
         return word
     
     def sentence2tokens(self, sentence: str):
