@@ -55,6 +55,7 @@ class LinearSpectrogram(nn.Module):
             return_complex=True
         )
 
+
         if self.power is not None:
             x = x.abs().pow(self.power)
 

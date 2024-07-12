@@ -1,9 +1,11 @@
 import torch
 import torch.nn as nn
+from torch.cuda.amp import autocast
 import torch.nn.functional as F
 from model.modules.encoder import TextEncoder, PosteriorEncoder
 from model.modules.duration import StochasticDurationPredictor
 from model.modules.flow import Flow
+from model.modules.audio import LinearSpectrogram
 from model.modules.vocoder import Generator
 from model.utils.masking import generate_mask
 from model.utils.common import rand_slice_segments
@@ -34,11 +36,12 @@ class VITS(nn.Module):
         super().__init__()
         self.d_model = d_model
         self.hidden_channels = hidden_channels
+        self.hop_length = np.prod(upsample_rates)
         if segment_size is not None:
-            self.segment_size = segment_size // np.prod(upsample_rates)
+            self.segment_size = segment_size // self.hop_length
         else:
             self.segment_size = None
-
+        
         self.text_encoder = TextEncoder(
             token_size=token_size,
             n_blocks=n_blocks,
@@ -50,6 +53,18 @@ class VITS(nn.Module):
 
         self.projection = nn.Conv1d(in_channels=hidden_channels, out_channels=2*hidden_channels, kernel_size=1)
 
+        self.linear_spectrogram = LinearSpectrogram()
+
+        self.posterior_encoder = PosteriorEncoder(
+            n_mel_channels=n_mel_channels,
+            hidden_channels=d_model,
+            out_channels=hidden_channels,
+            kernel_size=5,
+            n_layers=16,
+            dilation_rate=1,
+            gin_channels=gin_channels
+        )
+        
         self.flow = Flow(
             n_flows=4, in_channels=hidden_channels, hidden_channels=hidden_channels, kernel_size=5, dilation_rate=1, n_layers=4, gin_channels=gin_channels
         )
@@ -86,27 +101,36 @@ class VITS(nn.Module):
         if gin_channels is not None:
             self.gin_channels = gin_channels
             if n_speakers is not None and n_speakers > 1:
-                self.speaker_embedding = nn.Embedding(num_embeddings=n_speakers, embedding_dim=gin_channels)
+                self.speaker_encoder = nn.Embedding(num_embeddings=n_speakers, embedding_dim=gin_channels)
 
-    def forward(self, x: torch.Tensor, z: torch.Tensor, x_lengths: Optional[torch.Tensor] = None, z_mask: Optional[torch.Tensor] = None, g: Optional[torch.Tensor] = None):
-        batch_size = x.size(0)
-        
+    def forward(self, x: torch.Tensor, y: torch.Tensor, x_lengths: Optional[torch.Tensor] = None, y_lengths: Optional[torch.Tensor] = None, sid: Optional[torch.Tensor] = None):        
+        if sid is not None:
+            g = self.speaker_encoder(sid).unsqueeze(-1)
+        else:
+            g = None
+
         x_mask = None
         if x_lengths is not None:
             x_mask = generate_mask(x_lengths).unsqueeze(dim=1)
-
-        if z_mask is not None:
-            z_lengths = z_mask.sum(dim=1)
-        else:
-            z_lengths = torch.ones((batch_size), device=x.device, dtype=x.dtype) * z.size(1)
+        y_mask = None
+        if y_lengths is not None:
+            y_mask = generate_mask(y_lengths).unsqueeze(dim=1)
 
         h_text = self.text_encoder(x, x_mask if x_mask is not None else None)
         text_stats = self.projection(h_text)
         if x_mask is not None:
             text_stats = text_stats * x_mask
         m_p, logs_p = torch.split(text_stats, [self.hidden_channels]*2, dim=1)
+
+        with torch.no_grad():
+            with autocast(enabled=False):
+                lin_spec = self.linear_spectrogram(y)
+        y_lengths = y_lengths // self.hop_length
+        z, m_q, logs_q = self.posterior_encoder(lin_spec)
+        if y_mask is not None:
+            z = z * y_mask
         
-        z_p, _ = self.flow(z, mask=z_mask, g=g)
+        z_p, _ = self.flow(z, mask=y_mask, g=g)
 
         with torch.no_grad():
             s_pq = torch.exp(-2*logs_p) # (batch_size, hidden_channels, text_length)
@@ -117,7 +141,7 @@ class VITS(nn.Module):
             neg_cent_4 = torch.sum(-0.5 * (m_p**2) * s_pq, dim=1, keepdim=True) # (batch_size, 1, text_length)
 
             neg_cent = neg_cent_1 + neg_cent_2 + neg_cent_3 + neg_cent_4
-            attn = find_path(neg_cent, text_lengths=x_lengths, mel_lengths=z_mask.sum(dim=1)).unsqueeze(1).detach()
+            attn = find_path(neg_cent, text_lengths=x_lengths, mel_lengths=y_lengths).unsqueeze(1).detach()
 
         l_length = self.duration_predictor(h_text, w=attn.sum(dim=2), mask=x_mask, g=g)
         if x_mask is not None:
@@ -130,13 +154,13 @@ class VITS(nn.Module):
         logs_p = torch.matmul(attn, logs_p.transpose(-1, -2)).transpose(1,2)
 
         if self.segment_size is not None:
-            sliced_z, sliced_indexes = rand_slice_segments(z, z_lengths, self.segment_size)
+            sliced_z, sliced_indexes = rand_slice_segments(z, y_lengths, self.segment_size)
             o = self.decoder(sliced_z, g=g)
         else:
             o = self.decoder(z, g=g)
             sliced_indexes = None
 
-        return o, l_length, sliced_indexes, x_mask, z_p, m_p, logs_p
+        return o, lin_spec, l_length, sliced_indexes, x_mask, y_mask, z, z_p, m_p, logs_p, m_q, logs_q
     
     def infer(self, x: torch.Tensor, x_lengths: Optional[torch.Tensor] = None, sid: Optional[torch.Tensor] = None, length_scale: int = 1, noise_scale: float = 1.0, max_len: Optional[int] = None):
         batch_size = x.size(0)
