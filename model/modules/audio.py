@@ -9,12 +9,13 @@ from typing import Optional
 class LinearSpectrogram(nn.Module):
     def __init__(self,
                  sample_rate: int = 22050,
-                 n_fft: int = 1024,
+                 n_fft: int = 2048,
                  hop_length: int = 256,
                  win_length: Optional[int] = None,
                  n_mel_channels: int = 80,
                  fmin: float = 0.0,
-                 fmax: float = 8000.0) -> None:
+                 fmax: float = 8000.0,
+                 power: Optional[float] = 2.0) -> None:
         super().__init__()
 
         self.sample_rate = sample_rate
@@ -23,6 +24,8 @@ class LinearSpectrogram(nn.Module):
         self.win_length = win_length if win_length is not None else n_fft
 
         self.num_pad = (n_fft - hop_length) // 2
+
+        self.power = power
 
         self.mel_scale = MelScale(
             n_stft=n_fft//2 + 1,
@@ -52,10 +55,13 @@ class LinearSpectrogram(nn.Module):
             return_complex=True
         )
 
-        x = x.abs().pow(2.0)
+
+        if self.power is not None:
+            x = x.abs().pow(self.power)
+
         x = self.mel_scale(x)
-        x = torch.log(x.clamp_min(1e-5))
-        
+        x = torch.log(x.clamp(min=1e-5))
+
         return x
 
 class MelScale(nn.Module):

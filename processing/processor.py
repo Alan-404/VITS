@@ -23,6 +23,7 @@ class VITSProcessor:
         self.yolo = patterns
         self.replace_dict = patterns['replace']
         self.mapping = patterns['mapping']
+        self.single_vowels = patterns['single_vowel']
         vocab = []
 
         for key in patterns.keys():
@@ -111,13 +112,17 @@ class VITSProcessor:
     def mel_spectrogram(self, signal: torch.Tensor) -> torch.Tensor:
         if signal.device != self.device:
             signal = signal.to(self.device)
+        print(signal.shape)
         signal = F.pad(signal.unsqueeze(1), (int((self.n_fft-self.hop_length)/2), int((self.n_fft-self.hop_length)/2)), mode='reflect')
+        print(signal.shape)
         signal = signal.squeeze(1)
-
-        spec = torch.view_as_real(torch.stft(signal, n_fft=self.n_fft, hop_length=self.hop_length, win_length=self.win_length, window=self.hann_window,
-                      center=False, pad_mode='reflect', normalized=False, onesided=True, return_complex=True))
+        print(signal.shape)
+        spec = torch.stft(signal, n_fft=self.n_fft, hop_length=self.hop_length, win_length=self.win_length, window=self.hann_window,
+                      center=False, pad_mode='reflect', normalized=False, onesided=True, return_complex=True)
+        print(spec.shape)
         spec = torch.sqrt(spec.pow(2).sum(-1) + 1e-6)
-
+        print(spec.shape)
+        print(self.mel_basis.shape)
         spec = torch.matmul(self.mel_basis, spec)
         spec = self.spectral_normalize(spec)
 
@@ -208,15 +213,14 @@ class VITSProcessor:
         return graphemes
     
     def sentence2phonemes(self, sentence: str):
-        sentence = self.spec_replace(self.clean_text(sentence.upper()))
-        sentence = self.clean_text(sentence)
+        sentence = self.clean_text(sentence.upper())
         words = sentence.split(" ")
         graphemes = []
 
         length = len(words)
 
         for index, word in enumerate(words):
-            graphemes += self.slide_graphemes(word, self.pattern, n_grams=4)
+            graphemes += self.slide_graphemes(self.spec_replace(word), self.pattern, n_grams=4)
             if index != length - 1:
                 graphemes.append(self.delim_token)
 
@@ -237,9 +241,14 @@ class VITSProcessor:
         
         return words
     
-    def spec_replace(self, word: str):
+    def spec_replace(self, word: str) -> str:
         for key in self.replace_dict:
-            word = word.replace(key, self.replace_dict[key])
+            arr = word.split(key)
+            if len(arr) == 2:
+                if arr[1] in self.single_vowels:
+                    return word
+                else:
+                    return word.replace(key, self.replace_dict[key])
         return word
     
     def sentence2tokens(self, sentence: str):

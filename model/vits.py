@@ -18,7 +18,7 @@ from typing import Optional, List
 class VITS(nn.Module):
     def __init__(self,
                  token_size: int,
-                 n_mel_channels: int,
+                 n_mel_channels: int = 80,
                  d_model: int = 192,
                  n_blocks: int = 6,
                  n_heads: int = 2,
@@ -67,6 +67,16 @@ class VITS(nn.Module):
         
         self.flow = Flow(
             n_flows=4, in_channels=hidden_channels, hidden_channels=hidden_channels, kernel_size=5, dilation_rate=1, n_layers=4, gin_channels=gin_channels
+        )
+
+        self.posterior_encoder = PosteriorEncoder(
+            n_mel_channels=n_mel_channels,
+            hidden_channels=d_model,
+            out_channels=hidden_channels,
+            kernel_size=5,
+            n_layers=16,
+            dilation_rate=1,
+            gin_channels=gin_channels
         )
 
         self.duration_predictor = StochasticDurationPredictor(
