@@ -17,7 +17,6 @@ from model.vits import VITS
 from model.modules.vocoder import MultiPeriodDiscriminator
 from evaluation import VITSCriterion
 from model.utils.common import slice_segments
-from mapping import save_checkpoint, load_checkpoint
 
 from tqdm import tqdm
 import statistics
@@ -125,7 +124,6 @@ def train(rank: int,
     if rank == 0:
         n_steps = 0
         current_epoch = 0
-        saved_checkpoint_items = []
         if logging:
             wandb.init(
                 project=project_name,
@@ -178,11 +176,6 @@ def train(rank: int,
     sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank) if world_size > 1 else RandomSampler(dataset)
     dataloader = DataLoader(dataset, batch_size=batch_size, sampler=sampler, collate_fn=collate_fn)
 
-    # if val_path is not None:
-    #     val_dataset = VITSDataset(val_path, processor=processor, num_examples=num_val_samples)
-    #     val_sampler = DistributedSampler(val_dataset, num_replicas=world_size, rank=rank, shuffle=False) if world_size > 1 else RandomSampler(val_dataset)
-    #     val_dataloader = DataLoader(val_dataset, batch_size=val_batch_size, sampler=val_sampler, collate_fn=collate_fn)
-
     criterion = VITSCriterion()
 
     scaler = GradScaler(enabled=fp16)
@@ -197,29 +190,27 @@ def train(rank: int,
             dataloader.sampler.set_epoch(epoch)
         if rank == 0:
             print(f"Epoch: {epoch}")
-        recon_losses = []
-        kl_losses = []
-        dur_losses = []
-        gen_losses = []
-        fm_losses = []
+        train_recon_loss = 0.0
+        train_kl_loss = 0.0
+        train_gen_loss = 0.0
+        train_duration_loss = 0.0
+        train_fm_loss = 0.0
+        
+        train_disc_loss = 0.0
 
-        disc_losses = []
-
-        g_grad_norms = []
-        d_grad_norms = []
+        g_grad_norm = 0.0
+        d_grad_norm = 0.0
 
         generator.train()
         discriminator.train()
-        for _, (x, mels, x_lengths, mel_lengths, y) in enumerate(tqdm(dataloader, leave=False)):
+        for _, (x, y, x_lengths, y_lengths) in enumerate(tqdm(dataloader, leave=False)):
             x = x.to(rank)
-            mels = mels.to(rank)
-            x_lengths = x_lengths.to(rank)
-            mel_lengths = mel_lengths.to(rank)
-
             y = y.to(rank)
+            x_lengths = x_lengths.to(rank)
+            y_lengths = y_lengths.to(rank)
             
             with autocast(enabled=fp16):
-                y_hat, l_length, sliced_indexes, _, mel_mask, _, z_p, m_p, logs_p, _, logs_q = generator(x, mels, x_lengths, mel_lengths)
+                y_hat, mels, l_length, sliced_indexes, _, mel_mask, _, z_p, m_p, logs_p, _, logs_q = generator(x, y, x_lengths, y_lengths)
                 
                 mel_hat = processor.mel_spectrogram(y_hat.squeeze(1))
                 mel_truth = slice_segments(mels, sliced_indexes, mel_frame)
@@ -257,61 +248,51 @@ def train(rank: int,
 
             scaler.update()
 
+            train_recon_loss += recon_loss
+            train_kl_loss += kl_loss
+            train_gen_loss += gen_loss
+            train_duration_loss += dur_loss
+            train_fm_loss += fm_loss
+
+            train_disc_loss += disc_loss
+
+            g_grad_norm += generator_grad_norm
+            d_grad_norm += disc_grad_norm
+
             if rank == 0:
-                recon_losses.append(recon_loss.item())
-                kl_losses.append(kl_loss.item())
-                dur_losses.append(dur_loss.item())
-                gen_losses.append(gen_loss.item())
-                fm_losses.append(fm_loss.item())
-
-                disc_losses.append(disc_loss.item())
-
-                g_grad_norms.append(generator_grad_norm)
-                d_grad_norms.append(disc_grad_norm)
-
                 n_steps += 1
         
         # Schedulers step
         gen_scheduler.step()
         disc_scheduler.step()
 
-        mean_recon_loss = statistics.mean(recon_losses)
-        mean_kl_loss = statistics.mean(kl_losses)
-        mean_dur_loss = statistics.mean(dur_losses)
-        mean_gen_loss = statistics.mean(gen_losses)
-        mean_fm_loss = statistics.mean(fm_losses)
+        num_batches = len(dataloader)
 
-        mean_disc_loss = statistics.mean(disc_losses)
+        train_recon_loss = train_recon_loss / num_batches
+        train_kl_loss = train_kl_loss / num_batches
+        train_duration_loss = train_duration_loss / num_batches
+        train_gen_loss = train_gen_loss / num_batches
+        train_fm_loss = train_fm_loss / num_batches
 
-        g_grad_norm = statistics.mean(g_grad_norms)
-        d_grad_norm = statistics.mean(d_grad_norms)
+        train_disc_loss = train_disc_loss / num_batches
 
-        if world_size > 1:
-            mean_recon_loss = dist.all_reduce(torch.tensor(mean_recon_loss).to(rank), op=dist.ReduceOp.SUM) / world_size
-            mean_kl_loss = dist.all_reduce(torch.tensor(mean_kl_loss).to(rank), op=dist.ReduceOp.SUM) / world_size
-            mean_dur_loss = dist.all_reduce(torch.tensor(mean_dur_loss).to(rank), op=dist.ReduceOp.SUM) / world_size
-            mean_gen_loss = dist.all_reduce(torch.tensor(mean_gen_loss).to(rank), op=dist.ReduceOp.SUM) / world_size
-            mean_fm_loss = dist.all_reduce(torch.tensor(mean_fm_loss).to(rank), op=dist.ReduceOp.SUM) / world_size
-
-            mean_disc_loss = dist.all_reduce(torch.tensor(mean_disc_loss).to(rank), op=dist.ReduceOp.SUM) / world_size
-
-            g_grad_norm = dist.all_reduce(torch.tensor(g_grad_norm).to(rank), op=dist.ReduceOp.SUM) / world_size
-            d_grad_norm = dist.all_reduce(torch.tensor(d_grad_norm).to(rank), op=dist.ReduceOp.SUM) / world_size
+        g_grad_norm = g_grad_norm / num_batches
+        d_grad_norm = d_grad_norm / num_batches
         
         if rank == 0:
-            elbo_loss = mean_recon_loss + mean_kl_loss
-            mean_vae_loss = elbo_loss + mean_dur_loss + mean_gen_loss + mean_fm_loss
+            elbo_loss = train_recon_loss + train_kl_loss
+            vae_loss = elbo_loss + train_duration_loss + train_gen_loss + train_fm_loss
             current_lr = gen_optim.param_groups[0]['lr']
-            print(f'Reconstruction Loss: {(mean_recon_loss):.4f}')
-            print(f"KL Loss: {(mean_kl_loss):.4f}")
-            print(f"Duration Loss: {(mean_dur_loss):.4f}")
-            print(f"Generation Loss: {(mean_gen_loss):.4f}")
-            print(f"Feature Map Loss: {(mean_fm_loss):.4f}")
+            print(f'Reconstruction Loss: {(train_recon_loss):.4f}')
+            print(f"KL Loss: {(train_kl_loss):.4f}")
+            print(f"Duration Loss: {(train_duration_loss):.4f}")
+            print(f"Generation Loss: {(train_gen_loss):.4f}")
+            print(f"Feature Map Loss: {(train_fm_loss):.4f}")
             print("-----------------------------------------")
             print(f"ELBO Loss: {(elbo_loss):.4f}")
-            print(f"VAE Loss: {(mean_vae_loss):.4f}")
+            print(f"VAE Loss: {(vae_loss):.4f}")
             print("=========================================")
-            print(f"Discriminator Loss: {(mean_disc_loss):.4f}")
+            print(f"Discriminator Loss: {(train_disc_loss):.4f}")
             print("=========================================")
             print(f"Current Learning Rate: {current_lr}")
             print("=========================================")
@@ -320,14 +301,14 @@ def train(rank: int,
             print("\n")
 
             wandb.log({
-                'recon_loss': mean_recon_loss,
-                'kl_loss': mean_kl_loss,
-                'duration_loss': mean_dur_loss,
-                'generation_loss': mean_gen_loss,
-                'feature_map_loss': mean_fm_loss,
+                'recon_loss': train_recon_loss,
+                'kl_loss': train_kl_loss,
+                'duration_loss': train_duration_loss,
+                'generation_loss': train_gen_loss,
+                'feature_map_loss': train_fm_loss,
                 'elbo_loss': elbo_loss,
-                'vae_loss': mean_vae_loss,
-                'discriminator_loss': mean_disc_loss,
+                'vae_loss': vae_loss,
+                'discriminator_loss': train_disc_loss,
                 'learning_rate': current_lr,
                 'generator_gradient_norm': g_grad_norm,
                 'discriminator_gradient_norm': d_grad_norm

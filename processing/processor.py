@@ -282,7 +282,7 @@ class VITSProcessor:
     def as_target(self, signals: List[torch.Tensor]):
         lengths = []
         max_length = 0
-        
+
         for signal in signals:
             length = len(signal)
             lengths.append(length)
@@ -291,75 +291,9 @@ class VITSProcessor:
         
         padded_signals = []
         for index, signal in enumerate(signals):
-            padded_signals.append(F.pad(signal, (0, max_length - lengths[index]), mode='constant', value=0.0))
-
-        padded_signals = torch.stack(padded_signals)
-        mels = self.mel_spectrogram(padded_signals)
-        lengths = torch.tensor(lengths) // self.hop_length
-
-        return mels, lengths, padded_signals
-    
-    def get_audio_signal(self, paths: List[str]):
-        signals = []
-        for path in paths:
-            signals.append(self.load_audio(path))
-        return signals
-    
-    def get_spectrum(self, signals: Union[List[torch.Tensor], Tuple[torch.Tensor]]):
-        lengths = []
-        max_length = 0
-        
-        for signal in signals:
-            length = len(signal)
-            lengths.append(length)
-            if max_length < length:
-                max_length = length
-
-        mel_lengths = []
-        padded_signals = []
-        for index, signal in enumerate(signals):
-            padded_signals.append(F.pad(signal, (0, max_length - lengths[index]), mode='constant', value=0.0))
-            mel_lengths.append((lengths[index] // self.hop_length))
-
-        padded_signals = torch.stack(padded_signals)
-        mels = self.mel_spectrogram(padded_signals)
-
-        return padded_signals, torch.tensor(lengths), mels, torch.tensor(mel_lengths)
-
-    def setup_audio(self, signals: List[torch.Tensor]):
-        lengths = []
-        max_length = 0
-        
-        for signal in signals:
-            length = len(signal)
-            lengths.append(length)
-            if max_length < length:
-                max_length = length
-        
-        padded_signals = []
-        for index, signal in enumerate(signals):
-            padded_signals.append(F.pad(signal, (0, max_length - lengths[index]), mode='constant', value=0.0))
+            padded_signals.append(
+                F.pad(signal, (0, max_length - lengths[index]), value=0.0)
+            )
 
         return torch.stack(padded_signals), torch.tensor(lengths)
     
-    def get_audio(self, paths: List[str]) -> torch.Tensor:
-        signals = self.get_audio_signal(paths)
-
-        lengths = []
-        max_length = 0
-        
-        for signal in signals:
-            length = len(signal)
-            lengths.append(length)
-            if max_length < length:
-                max_length = length
-
-        padded_signals = []
-        for index, signal in enumerate(signals):
-            padded_signals.append(F.pad(signal, (0, max_length - lengths[index]), mode='constant', value=0.0))
-            lengths[index] = (lengths[index] // self.hop_length)
-
-        padded_signals = torch.stack(padded_signals)
-        mels = self.mel_spectrogram(padded_signals)
-
-        return padded_signals, mels, torch.tensor(lengths)
