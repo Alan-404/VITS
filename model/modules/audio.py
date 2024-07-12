@@ -30,12 +30,13 @@ class LinearSpectrogram(nn.Module):
             sample_rate=sample_rate,
             f_min=fmin,
             f_max=fmax,
-            norm='slaney'
+            norm='slaney',
+            mel_scale='slaney'
         )
 
         self.register_buffer("window", torch.hann_window(self.win_length))
 
-    def forward(self, x: torch.Tensor, lengths: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = F.pad(x, (self.num_pad, self.num_pad), mode='reflect')
 
         x = torch.stft(
@@ -51,6 +52,10 @@ class LinearSpectrogram(nn.Module):
             return_complex=True
         )
 
+        x = x.abs().pow(2.0)
+        x = self.mel_scale(x)
+        x = torch.log(x.clamp_min(1e-5))
+        
         return x
 
 class MelScale(nn.Module):
